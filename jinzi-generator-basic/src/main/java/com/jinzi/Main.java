@@ -1,11 +1,14 @@
 package com.jinzi;
 
 
+import com.jinzi.cli.CommandExecutor;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.printf("Hello and welcome!");
-        for (int i = 1; i <= 5; i++) {
-            System.out.println("i = " + i);
-        }
+        // args = new String[]{"generate","-l","-a","-o"};
+        // args = new String[]{"config"};
+        // args = new String[]{"list"};
+        CommandExecutor commandExecutor = new CommandExecutor();
+        commandExecutor.doExecute(args);
     }
 }
