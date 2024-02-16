@@ -22,7 +22,6 @@ public class StaticGenerator {
         String inputPath =  projectPath + File.separator + "jinzi-generator-demo-projects" + File.separator + "acm-template";
         System.out.println(inputPath);
         String outputPath = projectPath;
-        // 复制separator
         copyFilesByRecursive(inputPath,outputPath);
     }
 
@@ -34,6 +33,12 @@ public class StaticGenerator {
     public static void copyFilesByHutool(String inputPath,String outputPath){
         FileUtil.copy(inputPath,outputPath,false);
     }
+
+    /**
+     * 使用递归的方法 找到目录下的文件 进行拷贝
+     * @param inputPath 输入文件路径
+     * @param outputPath 输出文件路径
+     */
     public static void copyFilesByRecursive(String inputPath,String outputPath){
         File inputFile = new File(inputPath);
         File outputFile = new File(outputPath);
@@ -55,6 +60,7 @@ public class StaticGenerator {
 
         if(inputFile.isDirectory()){
             System.out.println(inputFile.getName());
+            // 在目标目录创建一个和 输入目录相同的 目录名
             File destOutputFile = new File(outputFile,inputFile.getName());
             if(!destOutputFile.exists()){
                 destOutputFile.mkdirs();
@@ -72,4 +78,4 @@ public class StaticGenerator {
         }
     }
 }
-// todo  得到目录的完整结构树信息，可以由此制作出 文件 对比工具，目录分析工具，目录总结工具等
+//  todo  得到目录的完整结构树信息，可以由此制作出 文件 对比工具，目录分析工具，目录总结工具等
