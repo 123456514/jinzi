@@ -1,13 +1,8 @@
 package com.jinzi.generator;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ArrayUtil;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
  * 静态文件生成器
@@ -22,7 +17,7 @@ public class StaticGenerator {
         String inputPath =  projectPath + File.separator + "jinzi-generator-demo-projects" + File.separator + "acm-template";
         System.out.println(inputPath);
         String outputPath = projectPath;
-        copyFilesByRecursive(inputPath,outputPath);
+        copyFilesByHutool(inputPath,outputPath);
     }
 
     /**
@@ -33,49 +28,4 @@ public class StaticGenerator {
     public static void copyFilesByHutool(String inputPath,String outputPath){
         FileUtil.copy(inputPath,outputPath,false);
     }
-
-    /**
-     * 使用递归的方法 找到目录下的文件 进行拷贝
-     * @param inputPath 输入文件路径
-     * @param outputPath 输出文件路径
-     */
-    public static void copyFilesByRecursive(String inputPath,String outputPath){
-        File inputFile = new File(inputPath);
-        File outputFile = new File(outputPath);
-        try {
-            copyFileByRecursive(inputFile,outputFile);
-        } catch (IOException e) {
-            System.out.println("文件复制出错");
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 先创建目录，然后遍历目录内的文件，依次复制
-     * @param inputFile
-     * @param outputFile
-     * @throws IOException
-     */
-    private static void copyFileByRecursive(File inputFile,File outputFile) throws IOException {
-
-        if(inputFile.isDirectory()){
-            System.out.println(inputFile.getName());
-            // 在目标目录创建一个和 输入目录相同的 目录名
-            File destOutputFile = new File(outputFile,inputFile.getName());
-            if(!destOutputFile.exists()){
-                destOutputFile.mkdirs();
-            }
-            File[] files = inputFile.listFiles();
-            if(ArrayUtil.isEmpty(files)){
-                return;
-            }
-            for (File file : files){
-                copyFileByRecursive(file,destOutputFile);
-            }
-        }else{
-            Path destPath = outputFile.toPath().resolve(inputFile.getName());
-            Files.copy(inputFile.toPath(),destPath, StandardCopyOption.REPLACE_EXISTING);
-        }
-    }
 }
-//  todo  得到目录的完整结构树信息，可以由此制作出 文件 对比工具，目录分析工具，目录总结工具等
