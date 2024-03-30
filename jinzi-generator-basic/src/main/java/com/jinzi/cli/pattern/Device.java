@@ -1,5 +1,6 @@
 package com.jinzi.cli.pattern;
 
+// 接受者
 public class Device {
     // 源
     private String name;
