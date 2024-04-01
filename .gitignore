@@ -1,6 +1,6 @@
 ### custom template
 jinzi-generator.iml
-jinzi-generator-basic.iml
+jinzi-generator-marker.iml
 ### Java template
 # Compiled class file
 *.class

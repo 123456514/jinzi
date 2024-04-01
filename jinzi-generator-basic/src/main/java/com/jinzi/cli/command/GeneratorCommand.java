@@ -13,8 +13,8 @@ import java.util.concurrent.Callable;
 /**
  * 这个命令  就是生成代码 作用即时接收采纳数病生成代码
  */
-@Data
 @CommandLine.Command(name = "generate",mixinStandardHelpOptions = true)
+@Data
 public class GeneratorCommand implements Callable {
     @CommandLine.Option(names = {"-l","--loop"},description = "是否循环",arity = "0..1",interactive = true,echo = true)
     private boolean loop;
