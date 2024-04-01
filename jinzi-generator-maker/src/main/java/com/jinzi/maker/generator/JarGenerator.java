@@ -3,6 +3,9 @@ package com.jinzi.maker.generator;
 import java.io.*;
 import java.util.Map;
 
+/**
+ * Jar包生成
+ */
 public class JarGenerator {
 
     public static void doGenerate(String projectDir) throws IOException, InterruptedException {

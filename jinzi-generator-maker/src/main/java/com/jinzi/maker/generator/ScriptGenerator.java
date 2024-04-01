@@ -11,6 +11,9 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
+/**
+ * 脚本生成
+ */
 public class ScriptGenerator {
     public static void doGenerate(String outputPath, String jarPath) throws IOException {
         // 直接写入脚本文件

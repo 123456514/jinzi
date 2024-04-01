@@ -6,7 +6,8 @@
   "author": "zhoujin",
   "createTime": "2023-11-22",
   "fileConfig": {
-    "inputRootPath": "D:/code/jinzi-generator/jinzi-generator-demo-projects/acm-template-pro",
+    "inputRootPath": ".source/acm-template-pro",
+    "sourceRootPath": "D:/code/jinzi-generator/jinzi-generator-demo-projects/acm-template-pro",
     "outputRootPath": "generated",
     "type": "dir",
     "files": [
