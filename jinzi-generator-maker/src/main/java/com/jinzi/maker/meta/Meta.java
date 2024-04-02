@@ -35,7 +35,10 @@ public class Meta {
             private String outputPath;
             private String type;
             private String generateType;
-            private String condition;
+            private String condition; // 该分组共享的生成条件，同时控制组能多个文件的生成
+            private String groupKey; // 组的唯一标识
+            private String groupName; // 组的名称
+            private List<FileInfo> files; // 组中包含的文件
         }
     }
 

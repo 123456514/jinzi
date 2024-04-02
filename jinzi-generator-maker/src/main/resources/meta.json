@@ -12,23 +12,30 @@
     "type": "dir",
     "files": [
       {
-        "inputPath": "src/com/jinzi/acm/MainTemplate.java.ftl",
-        "outputPath": "src/com/jinzi/acm/MainTemplate.java",
-        "type": "file",
-        "generateType": "dynamic"
+        "groupKey": "git",
+        "groupName": "开源",
+        "type": "group",
+        "condition": "needGit",
+        "files": [
+          {
+            "inputPath": ".gitignore",
+            "outputPath": ".gitignore",
+            "type": "file",
+            "generateType": "static",
+          },
+          {
+            "inputPath": "README.md",
+            "outputPath": "README.md",
+            "type": "file",
+            "generateType": "static"
+          }
+        ]
       },
       {
-        "inputPath": ".gitignore",
-        "outputPath": ".gitignore",
-        "type": "file",
-        "generateType": "static",
-        "condition": "needGit"
-      },
-      {
-        "inputPath": "README.md",
-        "outputPath": "README.md",
-        "type": "file",
-        "generateType": "static"
+      "inputPath": "src/com/jinzi/acm/MainTemplate.java.ftl",
+      "outputPath": "src/com/jinzi/acm/MainTemplate.java",
+      "generateType": "dynamic",
+      "type": "file"
       }
     ]
   },
@@ -52,7 +59,7 @@
         "fieldName": "author",
         "type": "String",
         "description": "作者注释",
-        "defaultValue": "yupi",
+        "defaultValue": "zhoujin",
         "abbr": "a"
       },
       {

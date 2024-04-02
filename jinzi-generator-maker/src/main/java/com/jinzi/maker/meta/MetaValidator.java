@@ -81,6 +81,12 @@ public class MetaValidator {
             return;
         }
         for (Meta.FileConfig.FileInfo fileInfo : fileInfoList) {
+            // 由于新增了分组类别，当我呢间类别为group 时可以不填写文件输入输入路径信息
+            String type = fileInfo.getType();
+            // 如果类型为 group 不校验
+            if(FileTypeEnum.GROUP.getValue().equals(type)){
+                continue;
+            }
             // inputPath: 必填
             String inputPath = fileInfo.getInputPath();
             if (StrUtil.isBlank(inputPath)) {
@@ -93,7 +99,6 @@ public class MetaValidator {
                 fileInfo.setOutputPath(inputPath);
             }
             // type：默认 inputPath 有文件后缀（如 .java）为 file，否则为 dir
-            String type = fileInfo.getType();
             if (StrUtil.isBlank(type)) {
                 // 无文件后缀
                 if (StrUtil.isBlank(FileUtil.getSuffix(inputPath))) {
