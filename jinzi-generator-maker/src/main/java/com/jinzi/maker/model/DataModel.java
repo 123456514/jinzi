@@ -10,15 +10,22 @@ public class DataModel {
 
 
     /**
-     * 注释中 作者名称的替换
-     */
-    private String author = "jinzi";
-    /**
-     * 代码中输出值的替换
-     */
-    private String outputText = "输出结果";
-    /**
      * 是否循环 相当于一个开关
      */
     private boolean loop;
+    /**
+     * 核心模板
+     */
+    public MainTemplate mainTemplate;
+    @Data
+    public static class MainTemplate{
+        /**
+         * 注释中 作者名称的替换
+         */
+        private String author = "jinzi";
+        /**
+         * 代码中输出值的替换
+         */
+        private String outputText = "输出结果";
+    }
 }

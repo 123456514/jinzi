@@ -24,6 +24,8 @@ public class MetaManager {
         // 那么此时有一种方法 在这里我们使用 单例模式  在第一次创建成功 之后，以后每次使用这个bean对象的时候就只使用这一个对象即可，不用重复的创建 bean
         // 并且这里使用的是 双重校验锁的 懒汉模式的单例模式
         String mateJson = ResourceUtil.readUtf8Str("meta.json");
-        return JSONUtil.toBean(mateJson, Meta.class);
+        Meta newMeta = JSONUtil.toBean(mateJson, Meta.class);
+        MetaValidator.doValidAndFill(newMeta);
+        return newMeta;
     }
 }
