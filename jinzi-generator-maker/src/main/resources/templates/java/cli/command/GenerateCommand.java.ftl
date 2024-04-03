@@ -35,7 +35,7 @@ public class GenerateCommand implements Callable<Integer> {
     /**
      * ${modelInfo.groupName}
      */
-     static DataModel.${modelInfo.type} ${modelInfo.groupKey} = new DataModel.${modelInfo.type}();
+    static DataModel.${modelInfo.type} ${modelInfo.groupKey} = new DataModel.${modelInfo.type}();
 <#--    根据分组生成命令类-->
     @CommandLine.Command(name = "${modelInfo.groupKey}")
     @Data
