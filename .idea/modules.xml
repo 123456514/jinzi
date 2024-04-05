@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/generate/generate.iml" filepath="$PROJECT_DIR$/generate/generate.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jinzi-generator.iml" filepath="$PROJECT_DIR$/jinzi-generator.iml" />
     </modules>
   </component>
 </project>
