@@ -1,7 +1,6 @@
 package com.jinzi.maker.generator.file;
 
 import cn.hutool.core.io.FileUtil;
-import com.jinzi.maker.model.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;

@@ -46,7 +46,7 @@
         "type": "boolean",
         "description": "是否生成.gitignore文件",
         "defaultValue": true,
-        "abbr": "--needGit"
+        "abbr": "n"
       },
       {
         "fieldName": "loop",

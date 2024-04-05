@@ -18,7 +18,7 @@ public class MainTemplate {
             for (int num : arr) {
                 sum += num;
             }
-            System.out.println("Sum: " + sum);
+            System.out.println("${outputText}" + sum);
         }
         scanner.close();
     }
