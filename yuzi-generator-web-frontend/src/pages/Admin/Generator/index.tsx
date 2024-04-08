@@ -8,7 +8,7 @@ import '@umijs/max';
 import {Button, Input, message, Select, Space, Tag, Typography} from 'antd';
 import React, {useRef, useState} from 'react';
 import ProField from '@ant-design/pro-field';
-
+import './TagsStyles.css';
 /**
  * 代码生成器管理页面
  *
@@ -90,18 +90,17 @@ const GeneratorAdminPage: React.FC = () => {
       },
       render: (_, record) => {
         if (!record.tags) {
-          return <></>;
+          return null; // 使用null或<></>都可以，表示不渲染任何内容
         }
         return (
-          <Space>
+          <div className="vertical-tags"> {/* 使用自定义的CSS类 */}
             {record.tags.map((name: string) => (
-              <Tag key={name}>{name}</Tag>
-            ))}
-          </Space>
+              <Tag key={name} className="vertical-tag">{name}</Tag>))}
+          </div>
         );
       },
     },
-    {
+  {
       title: '图片',
       dataIndex: 'picture',
       valueType: 'image',

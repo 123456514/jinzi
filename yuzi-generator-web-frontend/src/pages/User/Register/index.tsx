@@ -99,7 +99,7 @@ const Register: React.FC = () => {
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
-          title="CodeXpress"
+          title="金子代码生成"
           subTitle={'开发者的得力助手，让代码生成变得简单、快捷。'}
           initialValues={{
             autoRegister: true,
