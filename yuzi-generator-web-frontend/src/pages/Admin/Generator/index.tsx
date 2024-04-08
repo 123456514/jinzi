@@ -1,15 +1,13 @@
 import CreateModal from '@/pages/Admin/Generator/components/CreateModal';
 import UpdateModal from '@/pages/Admin/Generator/components/UpdateModal';
-import {
-  deleteGeneratorUsingPost,
-  listGeneratorByPageUsingPost,
-} from '@/services/backend/generatorController';
-import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
+import {deleteGeneratorUsingPost, listGeneratorByPageUsingPost,} from '@/services/backend/generatorController';
+import {PlusOutlined} from '@ant-design/icons';
+import {ActionType, ProColumns} from '@ant-design/pro-components';
+import {ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Select, Space, Tag, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
+import {Button, Input, message, Select, Space, Tag, Typography} from 'antd';
+import React, {useRef, useState} from 'react';
+import ProField from '@ant-design/pro-field';
 
 /**
  * 代码生成器管理页面
@@ -59,7 +57,7 @@ const GeneratorAdminPage: React.FC = () => {
       hideInForm: true,
     },
     {
-      title: '名称',
+      title: '生成器名称',
       dataIndex: 'name',
       valueType: 'text',
     },
@@ -67,16 +65,8 @@ const GeneratorAdminPage: React.FC = () => {
       title: '描述',
       dataIndex: 'description',
       valueType: 'textarea',
-    },
-    {
-      title: '基础包',
-      dataIndex: 'basePackage',
-      valueType: 'text',
-    },
-    {
-      title: '版本',
-      dataIndex: 'version',
-      valueType: 'text',
+      ellipsis: true,
+      hideInSearch: true,
     },
     {
       title: '作者',
@@ -84,22 +74,31 @@ const GeneratorAdminPage: React.FC = () => {
       valueType: 'text',
     },
     {
+      title: '版本',
+      dataIndex: 'version',
+      valueType: 'text',
+      hideInSearch: true,
+    },
+    {
       title: '标签',
       dataIndex: 'tags',
-      valueType: 'text',
-      renderFormItem(schema) {
+      valueType: 'select',
+      renderFormItem: (schema) => {
         const { fieldProps } = schema;
         // @ts-ignore
-        return <Select mode="tags" {...fieldProps} />;
+        return <Select {...fieldProps} mode="tags" variant="outlined" />;
       },
-      render(_, record) {
+      render: (_, record) => {
         if (!record.tags) {
           return <></>;
         }
-
-        return JSON.parse(record.tags).map((tag: string) => {
-          return <Tag key={tag}>{tag}</Tag>;
-        });
+        return (
+          <Space>
+            {record.tags.map((name: string) => (
+              <Tag key={name}>{name}</Tag>
+            ))}
+          </Space>
+        );
       },
     },
     {
@@ -112,23 +111,85 @@ const GeneratorAdminPage: React.FC = () => {
       hideInSearch: true,
     },
     {
+      title: '包名',
+      dataIndex: 'basePackage',
+      valueType: 'text',
+      hideInSearch: true,
+    },
+    {
+      title: '版本控制',
+      dataIndex: 'versionControl',
+      valueType: 'switch',
+      hideInSearch: true,
+      initialValue: true,
+      valueEnum: {
+        true: {
+          text: '开启',
+        },
+        false: {
+          text: '关闭',
+        },
+      },
+      render: (_, record) => {
+        return record.versionControl ? '开启' : '关闭'; // 根据 versionControl 字段的值进行渲染
+      },
+    },
+    {
+      title: '强制交互',
+      dataIndex: 'forcedInteractiveSwitch',
+      valueType: 'switch',
+      hideInSearch: true,
+      initialValue: true,
+      valueEnum: {
+        true: {
+          text: '开启',
+        },
+        false: {
+          text: '关闭',
+        },
+      },
+      render: (_, record) => {
+        return record.forcedInteractiveSwitch ? '开启' : '关闭'; // 根据 versionControl 字段的值进行渲染
+      },
+    },
+    {
       title: '文件配置',
       dataIndex: 'fileConfig',
+      hideInSearch: true,
       valueType: 'jsonCode',
+      hideInTable: true,
+      render(_, record) {
+        if (!record.fileConfig) {
+          return '{}';
+        }
+        return <ProField text={JSON.stringify(record.fileConfig)} mode="read" valueType="jsonCode" />;
+      }
     },
     {
       title: '模型配置',
       dataIndex: 'modelConfig',
       valueType: 'jsonCode',
+      hideInSearch: true,
+      hideInTable: true,
+      render(_, record) {
+        if (!record.modelConfig) {
+          return '{}';
+        }
+        return <ProField text={JSON.stringify(record.modelConfig)} mode="read" valueType="jsonCode" />;
+      }
     },
     {
-      title: '产物包路径',
+      title: '产物路径',
       dataIndex: 'distPath',
       valueType: 'text',
+      hideInSearch: true,
+      hideInForm: true,
     },
     {
       title: '状态',
       dataIndex: 'status',
+      valueType: 'select',
+      hideInForm: true,
       valueEnum: {
         0: {
           text: '默认',
@@ -136,9 +197,18 @@ const GeneratorAdminPage: React.FC = () => {
       },
     },
     {
-      title: '创建用户',
-      dataIndex: 'userId',
+      title: '点赞',
+      dataIndex: 'thumbNum',
       valueType: 'text',
+      hideInSearch: true,
+      hideInForm: true,
+    },
+    {
+      title: '收藏',
+      dataIndex: 'favourNum',
+      valueType: 'text',
+      hideInSearch: true,
+      hideInForm: true,
     },
     {
       title: '创建时间',
@@ -179,14 +249,14 @@ const GeneratorAdminPage: React.FC = () => {
   ];
 
   return (
-    <div className="generator-admin-page">
+    <div className={'generator-admin-page'}>
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
         生成器管理
       </Typography.Title>
       <ProTable<API.Generator>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}

@@ -1,12 +1,12 @@
 import CreateModal from '@/pages/Admin/User/components/CreateModal';
 import UpdateModal from '@/pages/Admin/User/components/UpdateModal';
-import { deleteUserUsingPost, listUserByPageUsingPost } from '@/services/backend/userController';
-import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import {deleteUserUsingPost, listUserByPageUsingPost} from '@/services/backend/userController';
+import {PlusOutlined} from '@ant-design/icons';
+import type {ActionType, ProColumns} from '@ant-design/pro-components';
+import {PageContainer, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import { Button, message, Space, Typography } from 'antd';
-import React, { useRef, useState } from 'react';
+import {Button, message, Space, Typography} from 'antd';
+import React, {useRef, useState} from 'react';
 
 /**
  * 用户管理页面
@@ -78,19 +78,17 @@ const UserAdminPage: React.FC = () => {
       title: '简介',
       dataIndex: 'userProfile',
       valueType: 'textarea',
+      search: false,
     },
     {
       title: '权限',
       dataIndex: 'userRole',
       valueEnum: {
-        user: {
-          text: '用户',
-        },
-        admin: {
-          text: '管理员',
-        },
+        user: { text: '用户', status: 'user' },
+        admin: { text: '管理员', status: 'admin' },
       },
     },
+
     {
       title: '创建时间',
       sorter: true,
@@ -133,7 +131,7 @@ const UserAdminPage: React.FC = () => {
       <ProTable<API.User>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}

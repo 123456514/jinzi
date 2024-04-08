@@ -1,8 +1,7 @@
-import { addGeneratorUsingPost } from '@/services/backend/generatorController';
-import { ProColumns, ProTable } from '@ant-design/pro-components';
+import {addGeneratorUsingPost} from '@/services/backend/generatorController';
+import {ProColumns, ProTable} from '@ant-design/pro-components';
 import '@umijs/max';
-import { message, Modal } from 'antd';
-import React from 'react';
+import { message, Modal} from 'antd';
 
 interface Props {
   visible: boolean;
@@ -16,8 +15,8 @@ interface Props {
  * @param fields
  */
 const handleAdd = async (fields: API.GeneratorAddRequest) => {
-  fields.fileConfig = JSON.parse((fields.fileConfig || '{}') as string);
-  fields.modelConfig = JSON.parse((fields.modelConfig || '{}') as string);
+  fields.modelConfig = JSON.parse((fields.modelConfig || "{}") as string);
+  fields.fileConfig = JSON.parse((fields.fileConfig || "{}") as string);
   const hide = message.loading('正在添加');
   try {
     await addGeneratorUsingPost(fields);
@@ -37,10 +36,11 @@ const handleAdd = async (fields: API.GeneratorAddRequest) => {
  * @constructor
  */
 const CreateModal: React.FC<Props> = (props) => {
-  const { visible, columns, onSubmit, onCancel } = props;
+  const {visible, columns, onSubmit, onCancel} = props;
 
   return (
     <Modal
+      style={{ width: '800px' }}
       destroyOnClose
       title={'创建'}
       open={visible}
