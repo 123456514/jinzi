@@ -8,9 +8,14 @@ import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.constant.CommonConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
+import com.jinzi.web.mapper.GeneratorFavourMapper;
 import com.jinzi.web.mapper.GeneratorMapper;
+import com.jinzi.web.mapper.GeneratorThumbMapper;
+import com.jinzi.web.mapstruct.GeneratorConvert;
 import com.jinzi.web.model.dto.generator.GeneratorQueryRequest;
 import com.jinzi.web.model.entity.Generator;
+import com.jinzi.web.model.entity.GeneratorFavour;
+import com.jinzi.web.model.entity.GeneratorThumb;
 import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.GeneratorVO;
 import com.jinzi.web.model.vo.UserVO;
@@ -24,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,23 +46,34 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     @Resource
     private UserService userService;
 
+    @Resource
+    private GeneratorThumbMapper generatorThumbMapper;
+
+    @Resource
+    private GeneratorFavourMapper generatorFavourMapper;
+
+
     @Override
-    public void validGenerator(Generator generator, boolean add) {
-        if (generator == null) {
+    public void validGenerator(Generator Generator, boolean add) {
+        if (Generator == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        String name = generator.getName();
-        String description = generator.getDescription();
+        String name = Generator.getName();
+        List<String> tags = Generator.getTags();
+        String description = Generator.getDescription();
         // 创建时，参数不能为空
         if (add) {
-            ThrowUtils.throwIf(StringUtils.isAnyBlank(name,description), ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(StringUtils.isAnyBlank(name), ErrorCode.PARAMS_ERROR);
         }
-        // 有参数 数据校验
-        if(StringUtils.isNotBlank(name) && name.length() > 80){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"名称过长");
+        if(CollUtil.isEmpty(tags)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "标签不可为空");
         }
-        if(StringUtils.isNotBlank(description) && description.length() > 256){
-            throw new BusinessException(ErrorCode.PARAMS_ERROR,"描述过长");
+        // 有参数则校验
+        if (StringUtils.isNotBlank(name) && name.length() > 80) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "标题过长");
+        }
+        if (StringUtils.isNotBlank(description) && description.length() > 8192) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "内容过长");
         }
     }
 
@@ -72,53 +89,39 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         if (generatorQueryRequest == null) {
             return queryWrapper;
         }
-        Long id = generatorQueryRequest.getId();
-        Long notId = generatorQueryRequest.getNotId();
-        Long userId = generatorQueryRequest.getUserId();
         String searchText = generatorQueryRequest.getSearchText();
-        List<String> tags = generatorQueryRequest.getTags();
-        String name = generatorQueryRequest.getName();
-        String description = generatorQueryRequest.getDescription();
-        String basePackage = generatorQueryRequest.getBasePackage();
-        String version = generatorQueryRequest.getVersion();
-        String author = generatorQueryRequest.getAuthor();
-        String distPath = generatorQueryRequest.getDistPath();
-        Integer status = generatorQueryRequest.getStatus();
         String sortField = generatorQueryRequest.getSortField();
         String sortOrder = generatorQueryRequest.getSortOrder();
-
+        Long id = generatorQueryRequest.getId();
+        String title = generatorQueryRequest.getTitle();
+        String content = generatorQueryRequest.getContent();
+        List<String> tagList = generatorQueryRequest.getTags();
+        Long userId = generatorQueryRequest.getUserId();
         // 拼接查询条件
         if (StringUtils.isNotBlank(searchText)) {
             queryWrapper.and(qw -> qw.like("name", searchText).or().like("description", searchText));
         }
-        queryWrapper.like(StringUtils.isNotBlank(name),"name",name);
-        queryWrapper.like(StringUtils.isNotBlank(description),"description",description);
-        if (CollUtil.isNotEmpty(tags)) {
-            for (String tag : tags) {
+        queryWrapper.like(StringUtils.isNotBlank(title), "name", title);
+        queryWrapper.like(StringUtils.isNotBlank(content), "description", content);
+        if (CollUtil.isNotEmpty(tagList)) {
+            for (String tag : tagList) {
                 queryWrapper.like("tags", "\"" + tag + "\"");
             }
         }
-        queryWrapper.ne(ObjectUtils.isNotEmpty(notId), "id", notId);
         queryWrapper.eq(ObjectUtils.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjectUtils.isNotEmpty(userId), "userId", userId);
-        queryWrapper.eq(StringUtils.isNotBlank(basePackage), "basePackage", basePackage);
-        queryWrapper.eq(StringUtils.isNotBlank(version), "version", version);
-        queryWrapper.eq(StringUtils.isNotBlank(author), "author", author);
-        queryWrapper.eq(StringUtils.isNotBlank(distPath), "distPath", distPath);
-        queryWrapper.eq(ObjectUtils.isNotEmpty(status), "status", status);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
     }
 
-
-
     @Override
-    public GeneratorVO getGeneratorVO(Generator generator, HttpServletRequest request) {
-        GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
-        long generatorId = generator.getId();
+    public GeneratorVO getGeneratorVO(Generator Generator, HttpServletRequest request) {
+        GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
+
+        long generatorId = Generator.getId();
         // 1. 关联查询用户信息
-        Long userId = generator.getUserId();
+        Long userId = Generator.getUserId();
         User user = null;
         if (userId != null && userId > 0) {
             user = userService.getById(userId);
@@ -127,6 +130,20 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         generatorVO.setUser(userVO);
         // 2. 已登录，获取用户点赞、收藏状态
         User loginUser = userService.getLoginUserPermitNull(request);
+        if (loginUser != null) {
+            // 获取点赞
+            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
+            generatorThumbQueryWrapper.in("generatorId", generatorId);
+            generatorThumbQueryWrapper.eq("userId", loginUser.getId());
+            GeneratorThumb generatorThumb = generatorThumbMapper.selectOne(generatorThumbQueryWrapper);
+            generatorVO.setHasThumb(generatorThumb != null);
+            // 获取收藏
+            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
+            generatorFavourQueryWrapper.in("generatorId", generatorId);
+            generatorFavourQueryWrapper.eq("userId", loginUser.getId());
+            GeneratorFavour generatorFavour = generatorFavourMapper.selectOne(generatorFavourQueryWrapper);
+            generatorVO.setHasFavour(generatorFavour != null);
+        }
         return generatorVO;
     }
 
@@ -141,23 +158,42 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
                 .collect(Collectors.groupingBy(User::getId));
+        // 2. 已登录，获取用户点赞、收藏状态
+        Map<Long, Boolean> generatorIdHasThumbMap = new HashMap<>();
+        Map<Long, Boolean> generatorIdHasFavourMap = new HashMap<>();
+        User loginUser = userService.getLoginUserPermitNull(request);
+        if (loginUser != null) {
+            Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
+            loginUser = userService.getLoginUser(request);
+            // 获取点赞
+            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
+            generatorThumbQueryWrapper.in("generatorId", generatorIdSet);
+            generatorThumbQueryWrapper.eq("userId", loginUser.getId());
+            List<GeneratorThumb> generatorGeneratorThumbList = generatorThumbMapper.selectList(generatorThumbQueryWrapper);
+            generatorGeneratorThumbList.forEach(generatorGeneratorThumb -> generatorIdHasThumbMap.put(generatorGeneratorThumb.getGeneratorId(), true));
+            // 获取收藏
+            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
+            generatorFavourQueryWrapper.in("generatorId", generatorIdSet);
+            generatorFavourQueryWrapper.eq("userId", loginUser.getId());
+            List<GeneratorFavour> generatorFavourList = generatorFavourMapper.selectList(generatorFavourQueryWrapper);
+            generatorFavourList.forEach(generatorFavour -> generatorIdHasFavourMap.put(generatorFavour.getGeneratorId(), true));
+        }
         // 填充信息
-        List<GeneratorVO> generatorVOList = generatorList.stream().map(generator -> {
-            GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
-            Long userId = generator.getUserId();
+        List<GeneratorVO> generatorVOList = generatorList.stream().map(Generator -> {
+            GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
+            Long userId = Generator.getUserId();
             User user = null;
             if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
             generatorVO.setUser(userService.getUserVO(user));
+            generatorVO.setHasThumb(generatorIdHasThumbMap.getOrDefault(Generator.getId(), false));
+            generatorVO.setHasFavour(generatorIdHasFavourMap.getOrDefault(Generator.getId(), false));
             return generatorVO;
         }).collect(Collectors.toList());
         generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
     }
-
 }
-
-
 
 

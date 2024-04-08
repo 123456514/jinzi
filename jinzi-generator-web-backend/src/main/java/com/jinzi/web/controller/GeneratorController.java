@@ -1,6 +1,5 @@
 package com.jinzi.web.controller;
 
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jinzi.web.annotation.AuthCheck;
 import com.jinzi.web.common.BaseResponse;
@@ -10,7 +9,7 @@ import com.jinzi.web.common.ResultUtils;
 import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
-import com.jinzi.web.meta.Meta;
+import com.jinzi.web.mapstruct.GeneratorConvert;
 import com.jinzi.web.model.dto.generator.GeneratorAddRequest;
 import com.jinzi.web.model.dto.generator.GeneratorEditRequest;
 import com.jinzi.web.model.dto.generator.GeneratorQueryRequest;
@@ -21,12 +20,10 @@ import com.jinzi.web.model.vo.GeneratorVO;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 帖子接口
@@ -57,19 +54,12 @@ public class GeneratorController {
         if (generatorAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Generator generator = new Generator();
-        BeanUtils.copyProperties(generatorAddRequest, generator);
-        List<String> tags = generatorAddRequest.getTags();
-        generator.setTags(JSONUtil.toJsonStr(tags));
-        Meta.ModelConfig modelConfig = generatorAddRequest.getModelConfig();
-        generator.setModelConfig(JSONUtil.toJsonStr(modelConfig));
-        Meta.FileConfig fileConfig = generatorAddRequest.getFileConfig();
-        generator.setFileConfig(JSONUtil.toJsonStr(fileConfig));
-
-        // 参数校验
+        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByAddRequest(generatorAddRequest);
         generatorService.validGenerator(generator, true);
         User loginUser = userService.getLoginUser(request);
         generator.setUserId(loginUser.getId());
+        generator.setFavourNum(0);
+        generator.setThumbNum(0);
         boolean result = generatorService.save(generator);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         long newGeneratorId = generator.getId();
@@ -113,14 +103,7 @@ public class GeneratorController {
         if (generatorUpdateRequest == null || generatorUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Generator generator = new Generator();
-        BeanUtils.copyProperties(generatorUpdateRequest, generator);
-        List<String> tags = generatorUpdateRequest.getTags();
-        generator.setTags(JSONUtil.toJsonStr(tags));
-        Meta.ModelConfig modelConfig = generatorUpdateRequest.getModelConfig();
-        generator.setModelConfig(JSONUtil.toJsonStr(modelConfig));
-        Meta.FileConfig fileConfig = generatorUpdateRequest.getFileConfig();
-        generator.setFileConfig(JSONUtil.toJsonStr(fileConfig));
+        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByUpdateRequest(generatorUpdateRequest);
         // 参数校验
         generatorService.validGenerator(generator, false);
         long id = generatorUpdateRequest.getId();
@@ -222,14 +205,7 @@ public class GeneratorController {
         if (generatorEditRequest == null || generatorEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Generator generator = new Generator();
-        BeanUtils.copyProperties(generatorEditRequest, generator);
-        List<String> tags = generatorEditRequest.getTags();
-        generator.setTags(JSONUtil.toJsonStr(tags));
-        Meta.ModelConfig modelConfig = generatorEditRequest.getModelConfig();
-        generator.setModelConfig(JSONUtil.toJsonStr(modelConfig));
-        Meta.FileConfig fileConfig = generatorEditRequest.getFileConfig();
-        generator.setFileConfig(JSONUtil.toJsonStr(fileConfig));
+        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByEditRequest(generatorEditRequest);
         // 参数校验
         generatorService.validGenerator(generator, false);
         User loginUser = userService.getLoginUser(request);

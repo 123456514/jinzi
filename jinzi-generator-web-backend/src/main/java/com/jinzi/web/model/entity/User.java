@@ -8,11 +8,13 @@ import java.util.Date;
 
 /**
  * 用户
- * @TableName user
+ *
+ * @author codeZhang
  */
-@TableName(value ="user")
+@TableName(value = "user")
 @Data
 public class User implements Serializable {
+
     /**
      * id
      */
@@ -20,12 +22,12 @@ public class User implements Serializable {
     private Long id;
 
     /**
-     * 账号
+     * 用户账号
      */
     private String userAccount;
 
     /**
-     * 密码
+     * 用户密码
      */
     private String userPassword;
 
@@ -58,6 +60,16 @@ public class User implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 用户状态1 正常 2冻结
+     */
+    private String accountStatus;
+
+    /**
+     * 用户邮箱
+     */
+    private String userEmail;
 
     /**
      * 是否删除

@@ -17,17 +17,17 @@ export async function addGeneratorUsingPost(
   });
 }
 
-/** cacheGenerator POST /api/generator/cache */
-export async function cacheGeneratorUsingPost(
-  body: API.GeneratorCacheRequest,
+/** cacheGenerator GET /api/generator/cache */
+export async function cacheGeneratorUsingGet(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.cacheGeneratorUsingGETParams,
   options?: { [key: string]: any },
 ) {
   return request<any>('/api/generator/cache', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+    method: 'GET',
+    params: {
+      ...params,
     },
-    data: body,
     ...(options || {}),
   });
 }
@@ -122,21 +122,6 @@ export async function listGeneratorVoByPageUsingPost(
   });
 }
 
-/** listGeneratorVOByPageFast POST /api/generator/list/page/vo/fast */
-export async function listGeneratorVoByPageFastUsingPost(
-  body: API.GeneratorQueryRequest,
-  options?: { [key: string]: any },
-) {
-  return request<API.BaseResponsePageGeneratorVO_>('/api/generator/list/page/vo/fast', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: body,
-    ...(options || {}),
-  });
-}
-
 /** makeGenerator POST /api/generator/make */
 export async function makeGeneratorUsingPost(
   body: API.GeneratorMakeRequest,
@@ -182,12 +167,12 @@ export async function updateGeneratorUsingPost(
   });
 }
 
-/** useGenerator POST /api/generator/use */
+/** useGenerator POST /api/generator/useGenerator */
 export async function useGeneratorUsingPost(
   body: API.GeneratorUseRequest,
   options?: { [key: string]: any },
 ) {
-  return request<any>('/api/generator/use', {
+  return request<any>('/api/generator/useGenerator', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

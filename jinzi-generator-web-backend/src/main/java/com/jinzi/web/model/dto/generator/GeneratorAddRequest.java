@@ -50,7 +50,7 @@ public class GeneratorAddRequest implements Serializable {
     /**
      * 文件配置（json字符串）
      */
-    private Meta.FileConfig fileConfig;
+    private Meta.FileConfigDTO fileConfigDTO;
 
     /**
      * 模型配置（json字符串）

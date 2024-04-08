@@ -1,21 +1,23 @@
 import Footer from '@/components/Footer';
-import { userRegisterUsingPost } from '@/services/backend/userController';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { sendVerificationCodeUsingPost } from '@/services/backend/reCaptchaController';
+import { userRegisterUsingPost as userRegister } from '@/services/backend/userController';
+import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { Helmet, history, useModel } from '@umijs/max';
-import { message, Tabs } from 'antd';
+import { Helmet, history } from '@umijs/max';
+import { Button, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { Link } from 'umi';
 import Settings from '../../../../config/defaultSettings';
 
-/**
- * 用户注册页面
- * @constructor
- */
-const UserRegisterPage: React.FC = () => {
+const Register: React.FC = () => {
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+
+  const [email, setEmail] = useState<string>('');
+
+  const [isSending, setIsSending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
   const containerClassName = useEmotionCss(() => {
     return {
       display: 'flex',
@@ -31,17 +33,50 @@ const UserRegisterPage: React.FC = () => {
   const handleSubmit = async (values: API.UserRegisterRequest) => {
     try {
       // 注册
-      await userRegisterUsingPost({
+      await userRegister({
         ...values,
       });
-
-      const defaultLoginSuccessMessage = '注册成功！';
-      message.success(defaultLoginSuccessMessage);
+      const defaultRegisterSuccessMessage = '注册成功！';
+      message.success(defaultRegisterSuccessMessage);
+      // 注册成功后跳转到登录页面
       history.push('/user/login');
       return;
     } catch (error: any) {
-      const defaultLoginFailureMessage = `注册失败，${error.message}`;
-      message.error(defaultLoginFailureMessage);
+      const defaultRegisterFailureMessage = `注册失败，${error.message}`;
+      message.error(defaultRegisterFailureMessage);
+    }
+  };
+
+  // 倒计时函数
+  const startCountdown = () => {
+    const interval = setInterval(() => {
+      setCountdown((prevCountdown) => {
+        if (prevCountdown > 1) {
+          return prevCountdown - 1;
+        } else {
+          setIsSending(false);
+          clearInterval(interval);
+          return 0;
+        }
+      });
+    }, 1000);
+    // 组件卸载时清除倒计时
+    return () => clearInterval(interval);
+  };
+
+  const buttonText = isSending ? (countdown ? `${countdown}s 后重发` : '发送中...') : '获取验证码';
+
+  const handleSendCode = async (e: any) => {
+    e.preventDefault();
+    setIsSending(true);
+    try {
+      await sendVerificationCodeUsingPost({ userEmail: email });
+      setCountdown(10);
+      startCountdown();
+      message.success('发送成功');
+    } catch (error: any) {
+      setIsSending(false);
+      message.error(error.message);
     }
   };
 
@@ -58,16 +93,16 @@ const UserRegisterPage: React.FC = () => {
           padding: '32px 0',
         }}
       >
-        <LoginForm
+        <LoginForm<API.UserRegisterRequest>
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
-          title="金子代码生成"
-          subTitle={'代码生成器在线制作共享，大幅提升开发效率'}
+          title="CodeXpress"
+          subTitle={'开发者的得力助手，让代码生成变得简单、快捷。'}
           initialValues={{
-            autoLogin: true,
+            autoRegister: true,
           }}
           submitter={{
             searchConfig: {
@@ -75,7 +110,7 @@ const UserRegisterPage: React.FC = () => {
             },
           }}
           onFinish={async (values) => {
-            await handleSubmit(values as API.UserLoginRequest);
+            await handleSubmit(values as API.UserRegisterRequest);
           }}
         >
           <Tabs
@@ -105,6 +140,47 @@ const UserRegisterPage: React.FC = () => {
                   },
                 ]}
               />
+              <ProFormText
+                name="userEmail"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <SafetyOutlined />,
+                  onChange: (e) => {
+                    setEmail(e.target.value);
+                  },
+                }}
+                placeholder={'请输入邮箱'}
+                rules={[
+                  {
+                    required: true,
+                    message: '邮箱是必填项！',
+                  },
+                ]}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <ProFormText
+                  name="code"
+                  fieldProps={{
+                    size: 'large',
+                    prefix: <SafetyOutlined />,
+                  }}
+                  placeholder={'请输入验证码'}
+                  rules={[
+                    {
+                      required: true,
+                      message: '验证码是必填项！',
+                    },
+                  ]}
+                />
+                <Button
+                  type="primary"
+                  style={{ marginLeft: '10px', marginTop: '5px' }}
+                  onClick={isSending ? () => {} : handleSendCode}
+                >
+                  {buttonText}
+                </Button>
+              </div>
+
               <ProFormText.Password
                 name="userPassword"
                 fieldProps={{
@@ -125,7 +201,7 @@ const UserRegisterPage: React.FC = () => {
                   size: 'large',
                   prefix: <LockOutlined />,
                 }}
-                placeholder={'请输入确认密码'}
+                placeholder={'请再次确认密码'}
                 rules={[
                   {
                     required: true,
@@ -150,4 +226,4 @@ const UserRegisterPage: React.FC = () => {
     </div>
   );
 };
-export default UserRegisterPage;
+export default Register;

@@ -2,7 +2,7 @@ import java.util.Scanner;
 
 /**
 * ACM 输入模板（多数之和）
-* @author  周津
+* @author  zhoujin
 */
 public class MainTemplate {
     public static void main(String[] args) {
@@ -22,7 +22,7 @@ public class MainTemplate {
             for (int num : arr) {
                 sum += num;
             }
-            System.out.println("sum" + sum);
+            System.out.println("sum = " + sum);
         }
         scanner.close();
     }

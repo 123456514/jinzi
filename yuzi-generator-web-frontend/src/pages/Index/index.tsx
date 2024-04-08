@@ -1,47 +1,54 @@
+import { listGeneratorVoByPageUsingPost } from '@/services/backend/generatorController';
+import { doGeneratorFavourUsingPost } from '@/services/backend/generatorFavourController';
+import { doThumbUsingPost } from '@/services/backend/generatorThumbController';
 import {
-  listGeneratorVoByPageFastUsingPost
-} from '@/services/backend/generatorController';
-import { UserOutlined } from '@ant-design/icons';
-import { PageContainer, ProFormSelect, ProFormText, QueryFilter } from '@ant-design/pro-components';
-import { Avatar, Card, Flex, Image, Input, List, message, Tabs, Tag, Typography } from 'antd';
-import moment from 'moment';
+  DownOutlined,
+  LikeFilled,
+  LikeOutlined,
+  StarFilled,
+  StarOutlined,
+  UpOutlined,
+} from '@ant-design/icons';
+import {
+  PageContainer,
+  ProFormSelect,
+  ProFormText,
+  ProList,
+  QueryFilter,
+} from '@ant-design/pro-components';
+import { Link } from '@umijs/max';
+import { Flex, Image, Input, message, Tabs, Tag } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'umi';
 
-/**
- * 默认分页参数
- */
 const DEFAULT_PAGE_PARAMS: PageRequest = {
   current: 1,
-  pageSize: 12,
+  pageSize: 4,
   sortField: 'createTime',
-  sortOrder: 'descend',
+  // @ts-ignore
+  sortOrder: 'newest',
 };
 
-/**
- * 主页
- * @constructor
- */
 const IndexPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [dataList, setDataList] = useState<API.GeneratorVO[]>([]);
   const [total, setTotal] = useState<number>(0);
-  // 搜索条件
+  const [showFilter, setShowFilter] = useState<boolean>(true);
+
   const [searchParams, setSearchParams] = useState<API.GeneratorQueryRequest>({
     ...DEFAULT_PAGE_PARAMS,
   });
 
-  /**
-   * 搜索
-   */
   const doSearch = async () => {
     setLoading(true);
     try {
-      const res = await listGeneratorVoByPageFastUsingPost(searchParams);
+      const res = await listGeneratorVoByPageUsingPost(searchParams);
       setDataList(res.data?.records ?? []);
-      setTotal(Number(res.data?.total) ?? 0);
+      setTotal(res.data?.total ?? 0);
     } catch (error: any) {
-      message.error('获取数据失败，' + error.message);
+      message.error('获取数据失败！', error.message);
+      setTimeout(() => {
+        message.destroy(); // 关闭所有消息提示
+      }, 3000);
     }
     setLoading(false);
   };
@@ -50,34 +57,66 @@ const IndexPage: React.FC = () => {
     doSearch();
   }, [searchParams]);
 
-  /**
-   * 标签列表
-   * @param tags
-   */
-  const tagListView = (tags?: string[]) => {
-    if (!tags) {
-      return <></>;
-    }
+  const IconText = ({ icon, text, onClick }: { icon: any; text: string; onClick?: () => void }) => (
+    <span onClick={onClick}>
+      {React.createElement(icon, { style: { marginInlineEnd: 8 } })}
+      {text}
+    </span>
+  );
 
-    return (
-      <div style={{ marginBottom: 8 }}>
-        {tags.map((tag) => (
-          <Tag key={tag}>{tag}</Tag>
-        ))}
-      </div>
-    );
+  /**
+   * 点赞
+   * @param req
+   */
+  const doThumb = async (req: API.GeneratorThumbAddRequest) => {
+    setLoading(true);
+    try {
+      const res = await doThumbUsingPost(req);
+      if (res.code === 0) {
+        message.success(res.data === 1 ? '点赞成功！' : '取消点赞！');
+        setSearchParams({
+          ...searchParams,
+        });
+      }
+    } catch (error: any) {
+      message.error('失败！', error.message);
+    }
+    setTimeout(() => {
+      message.destroy(); // 关闭所有消息提示
+    }, 3000);
+    setLoading(false);
+  };
+
+  /**
+   * 收藏
+   * @param req
+   */
+  const doFavour = async (req: API.GeneratorFavourAddRequest) => {
+    setLoading(true);
+    try {
+      const res = await doGeneratorFavourUsingPost(req);
+      if (res.code === 0) {
+        message.success(res.data === 1 ? '收藏成功！' : '取消收藏！');
+        setSearchParams({
+          ...searchParams,
+        });
+      }
+    } catch (error: any) {
+      message.error('失败！', error.message);
+    }
+    setTimeout(() => {
+      message.destroy(); // 关闭所有消息提示
+    }, 3000);
+    setLoading(false);
   };
 
   return (
     <PageContainer title={<></>}>
       <Flex justify="center">
         <Input.Search
-          style={{
-            width: '40vw',
-            minWidth: 320,
-          }}
-          placeholder="搜索代码生成器"
+          placeholder="请输入想要查找的生成器"
           allowClear
+          style={{ width: '40vw', minWidth: '233px' }}
           enterButton="搜索"
           size="large"
           onChange={(e) => {
@@ -85,18 +124,43 @@ const IndexPage: React.FC = () => {
           }}
           onSearch={(value: string) => {
             setSearchParams({
-              ...searchParams,
               ...DEFAULT_PAGE_PARAMS,
               searchText: value,
             });
           }}
         />
       </Flex>
-      <div style={{ marginBottom: 16 }} />
-
+      <div style={{ marginBottom: 12 }}></div>
       <Tabs
-        size="large"
         defaultActiveKey="newest"
+        onChange={(e) => {
+          if (e === 'newest') {
+            setSearchParams({
+              ...searchParams,
+              sortOrder: e,
+              sortField: 'createTime',
+            });
+          } else {
+            setSearchParams({
+              ...searchParams,
+              sortOrder: e,
+              sortField: 'thumbNum',
+            });
+          }
+        }}
+        tabBarExtraContent={
+          <a
+            style={{
+              display: 'flex',
+              gap: 4,
+            }}
+            onClick={() => {
+              setShowFilter(!showFilter);
+            }}
+          >
+            高级筛选 {showFilter ? <UpOutlined /> : <DownOutlined />}
+          </a>
+        }
         items={[
           {
             key: 'newest',
@@ -107,49 +171,34 @@ const IndexPage: React.FC = () => {
             label: '推荐',
           },
         ]}
-        onChange={() => {}}
       />
+      {showFilter ? (
+        <QueryFilter
+          span={12}
+          labelWidth="auto"
+          split
+          onFinish={async (values: API.GeneratorQueryRequest) => {
+            setSearchParams({
+              ...DEFAULT_PAGE_PARAMS,
+              searchText: searchParams.searchText,
+              ...values,
+            });
+          }}
+        >
+          <ProFormSelect label="标签" name="tags" mode="tags" />
+          <ProFormText label="名称" name="name" />
+          <ProFormText label="描述" name="description" />
+        </QueryFilter>
+      ) : null}
 
-      <QueryFilter
-        span={12}
-        labelWidth="auto"
-        labelAlign="left"
-        defaultCollapsed={false}
-        style={{ padding: '16px 0' }}
-        onFinish={async (values: API.GeneratorQueryRequest) => {
-          setSearchParams({
-            ...DEFAULT_PAGE_PARAMS,
-            // @ts-ignore
-            ...values,
-            searchText: searchParams.searchText,
-          });
-        }}
-      >
-        <ProFormSelect label="标签" name="tags" mode="tags" />
-        <ProFormText label="名称" name="name" />
-        <ProFormText label="描述" name="description" />
-      </QueryFilter>
-
-      <div style={{ marginBottom: 24 }} />
-
-      <List<API.GeneratorVO>
-        rowKey="id"
-        loading={loading}
-        grid={{
-          gutter: 16,
-          xs: 1,
-          sm: 2,
-          md: 3,
-          lg: 3,
-          xl: 4,
-          xxl: 4,
-        }}
-        dataSource={dataList}
+      <div style={{ marginBottom: 12 }}></div>
+      <ProList<API.GeneratorVO>
+        style={{ cursor: 'pointer' }}
         pagination={{
-          current: searchParams.current,
           pageSize: searchParams.pageSize,
+          current: searchParams.current,
           total,
-          onChange(current: number, pageSize: number) {
+          onChange(current, pageSize) {
             setSearchParams({
               ...searchParams,
               current,
@@ -157,34 +206,94 @@ const IndexPage: React.FC = () => {
             });
           },
         }}
-        renderItem={(data) => (
-          <List.Item>
-            <Link to={`/generator/detail/${data.id}`}>
-              <Card hoverable cover={<Image alt={data.name} src={data.picture} />}>
-                <Card.Meta
-                  title={<a>{data.name}</a>}
-                  description={
-                    <Typography.Paragraph ellipsis={{ rows: 2 }} style={{ height: 44 }}>
-                      {data.description}
-                    </Typography.Paragraph>
-                  }
+        itemLayout="vertical"
+        rowKey="id"
+        headerTitle=" "
+        dataSource={dataList}
+        metas={{
+          title: {
+            render: (_, entity) => {
+              return (
+                <div style={{ paddingLeft: '10px' }}>
+                  <Link
+                    style={{ color: '#333', fontSize: 18 }}
+                    to={`/generator/detail/${entity.id}`}
+                  >
+                    {entity.name}
+                  </Link>
+                </div>
+              );
+            },
+          },
+          description: {
+            render: (_, entity) => {
+              if (!entity.tags) {
+                return <></>;
+              }
+              return (
+                <div style={{ paddingLeft: '10px' }}>
+                  {entity.tags.map((item, index) => {
+                    return <Tag key={index}>{item}</Tag>;
+                  })}
+                </div>
+              );
+            },
+          },
+          actions: {
+            render: (_, entity) => (
+              <div
+                style={{
+                  paddingLeft: '10px',
+                  marginTop: '15px',
+                  display: 'flex',
+                  gap: '12px',
+                  cursor: 'pointer',
+                }}
+              >
+                <IconText
+                  icon={entity.hasThumb ? LikeFilled : LikeOutlined}
+                  // @ts-ignore
+                  text={entity.thumbNum}
+                  key="list-vertical-like-o"
+                  onClick={() => {
+                    doThumb({
+                      generatorId: entity.id,
+                    });
+                  }}
                 />
-                {tagListView(data.tags)}
-                <Flex justify="space-between" align="center">
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                    {moment(data.createTime).fromNow()}
-                  </Typography.Text>
-                  <div>
-                    <Avatar src={data.user?.userAvatar ?? <UserOutlined />} />
-                  </div>
-                </Flex>
-              </Card>
-            </Link>
-          </List.Item>
-        )}
+                <IconText
+                  icon={entity.hasFavour ? StarFilled : StarOutlined}
+                  // @ts-ignore
+                  text={entity.favourNum}
+                  key="list-vertical-star-o"
+                  onClick={() => {
+                    doFavour({
+                      generatorId: entity.id,
+                    });
+                  }}
+                />
+              </div>
+            ),
+          },
+          extra: {
+            render: (_: any, entity: { name: string | undefined; picture: string | undefined }) => {
+              return (
+                <div style={{ paddingRight: '10px' }}>
+                  {<Image width={220} height={180} alt={entity.name} src={entity.picture} />}
+                </div>
+              );
+            },
+          },
+          content: {
+            render: (_, entity) => {
+              return <div>{entity.description}</div>;
+            },
+          },
+        }}
       />
     </PageContainer>
   );
 };
 
+// @ts-ignore
 export default IndexPage;

@@ -1,17 +1,26 @@
 package com.jinzi.web.model.entity;
 
+
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.jinzi.web.meta.Meta;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 代码生成器
- * @TableName generator
+ *
+ * @author azhang
  */
-@TableName(value ="generator")
+@TableName(value = "generator",autoResultMap = true)
 @Data
+@ToString
+@EqualsAndHashCode
 public class Generator implements Serializable {
     /**
      * id
@@ -35,6 +44,16 @@ public class Generator implements Serializable {
     private String basePackage;
 
     /**
+     * git版本控制
+     */
+    private Boolean versionControl = false;
+
+    /**
+     * 强制交互式开关
+     */
+    private Boolean forcedInteractiveSwitch = true;
+
+    /**
      * 版本
      */
     private String version;
@@ -47,7 +66,8 @@ public class Generator implements Serializable {
     /**
      * 标签列表（json 数组）
      */
-    private String tags;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> tags;
 
     /**
      * 图片
@@ -57,12 +77,14 @@ public class Generator implements Serializable {
     /**
      * 文件配置（json字符串）
      */
-    private String fileConfig;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Meta.FileConfigDTO fileConfig;
 
     /**
      * 模型配置（json字符串）
      */
-    private String modelConfig;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private Meta.ModelConfig modelConfig;
 
     /**
      * 代码生成器产物路径
@@ -72,7 +94,17 @@ public class Generator implements Serializable {
     /**
      * 状态
      */
-    private Integer status;
+    private Integer status = 0;
+
+    /**
+     * 点赞数
+     */
+    private Integer thumbNum = 0;
+
+    /**
+     * 收藏数
+     */
+    private Integer favourNum = 0;
 
     /**
      * 创建用户 id

@@ -1,12 +1,10 @@
 package com.jinzi.web.model.vo;
 
-import cn.hutool.json.JSONUtil;
 import com.jinzi.web.meta.Meta;
-import com.jinzi.web.model.entity.Generator;
 import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,6 +13,27 @@ import java.util.List;
  */
 @Data
 public class GeneratorVO implements Serializable {
+
+    /**
+     * 创建人信息
+     */
+    private UserVO user;
+
+    /**
+     * 当前用户是否已点赞
+     */
+    private Boolean hasThumb;
+
+    /**
+     * 当前用户是否已收藏
+     */
+    private Boolean hasFavour;
+
+    /**
+     * id
+     */
+    private Long id;
+
     /**
      * 名称
      */
@@ -29,6 +48,16 @@ public class GeneratorVO implements Serializable {
      * 基础包
      */
     private String basePackage;
+
+    /**
+     * git版本控制
+     */
+    private Boolean versionControl;
+
+    /**
+     * 强制交互式开关
+     */
+    private Boolean forcedInteractiveSwitch;
 
     /**
      * 版本
@@ -53,7 +82,7 @@ public class GeneratorVO implements Serializable {
     /**
      * 文件配置（json字符串）
      */
-    private Meta.FileConfig fileConfig;
+    private Meta.FileConfigDTO fileConfig;
 
     /**
      * 模型配置（json字符串）
@@ -70,46 +99,25 @@ public class GeneratorVO implements Serializable {
      */
     private Integer status;
 
-    private UserVO user;
+    /**
+     * 点赞数
+     */
+    private Integer thumbNum;
+
+    /**
+     * 收藏数
+     */
+    private Integer favourNum;
+
+    /**
+     * 创建时间
+     */
+    private Date  createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 包装类转对象
-     * 相当于对象转 json 字符串 把对象原本是json 字符串的对象转化成为json字符串
-     * @param generatorVO
-     * @return
-     */
-    public static Generator voToObj(GeneratorVO generatorVO) {
-        if (generatorVO == null) {
-            return null;
-        }
-        Generator generator = new Generator();
-        BeanUtils.copyProperties(generatorVO, generator);
-        List<String> tagList = generatorVO.getTags();
-        Meta.FileConfig fileConfig = generatorVO.getFileConfig();
-        generator.setFileConfig(JSONUtil.toJsonStr(fileConfig));
-        Meta.ModelConfig modelConfig = generatorVO.getModelConfig();
-        generator.setModelConfig(JSONUtil.toJsonStr(modelConfig));
-        generator.setTags(JSONUtil.toJsonStr(tagList));
-        return generator;
-    }
-
-    /**
-     * 对象转包装类
-     *
-     * @param generator
-     * @return
-     */
-    public static GeneratorVO objToVo(Generator generator) {
-        if (generator == null) {
-            return null;
-        }
-        GeneratorVO generatorVO = new GeneratorVO();
-        BeanUtils.copyProperties(generator, generatorVO);
-        generatorVO.setTags(JSONUtil.toList(generator.getTags(), String.class));
-        generatorVO.setModelConfig(JSONUtil.toBean(generator.getModelConfig(),Meta.ModelConfig.class));
-        generatorVO.setFileConfig(JSONUtil.toBean(generator.getFileConfig(),Meta.FileConfig.class));
-        return generatorVO;
-    }
 }

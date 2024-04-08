@@ -22,14 +22,23 @@ spring:
     url: jdbc:mysql://124.223.222.249:3306/my_db
     username: root
     password: xy123456
+  mail:
+    host: smtp.qq.com     #默认平台服务地址无需更改
+    username: 2670253693@qq.com   #自己邮箱号
+    password: xhjkdddfcbxpdhjh    #这是我们在刚刚开启POP3/SMTP服务时收到的授权码(如果忘了把服务重开一次!)
+    default-encoding: utf-8 #改编码格式
+    protocol: smtp
+    port: 25 #端口号
+    properties:
+      mail.smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
   # Redis 配置
   # todo 需替换配置，然后取消注释
-#  redis:
-#    database: 1
-#    host: localhost
-#    port: 6379
-#    timeout: 5000
-#    password: 123456
+  redis:
+    database: 1
+    host: 124.223.222.249
+    port: 6379
+    timeout: 5000
+    password: 123456
   # Elasticsearch 配置
   # todo 需替换配置，然后取消注释
 #  elasticsearch:

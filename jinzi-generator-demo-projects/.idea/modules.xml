@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/acm-template/acm-template.iml" filepath="$PROJECT_DIR$/acm-template/acm-template.iml" />
+      <module fileurl="file://$PROJECT_DIR$/acm-template-pro/acm-template-pro.iml" filepath="$PROJECT_DIR$/acm-template-pro/acm-template-pro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/jinzi-generator-demo-projects.iml" filepath="$PROJECT_DIR$/.idea/jinzi-generator-demo-projects.iml" />
+    </modules>
+  </component>
+</project>

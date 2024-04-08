@@ -7,22 +7,20 @@ import lombok.EqualsAndHashCode;
 import java.io.Serializable;
 import java.util.List;
 
+
 /**
  * 查询请求
  *
+ * @author codeZhang
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class GeneratorQueryRequest extends PageRequest implements Serializable {
+
     /**
      * id
      */
     private Long id;
-
-    /**
-     * 不根据这些id 查数据
-     */
-    private Long notId;
 
     /**
      * 搜索词
@@ -30,7 +28,17 @@ public class GeneratorQueryRequest extends PageRequest implements Serializable {
     private String searchText;
 
     /**
-     * 标签列表（json 数组）
+     * 标题
+     */
+    private String title;
+
+    /**
+     * 内容
+     */
+    private String content;
+
+    /**
+     * 标签列表
      */
     private List<String> tags;
 
@@ -40,42 +48,9 @@ public class GeneratorQueryRequest extends PageRequest implements Serializable {
     private List<String> orTags;
 
     /**
-     * 名称
+     * 创建用户 id
      */
-    private String name;
-
-    /**
-     * 描述
-     */
-    private String description;
-
-    /**
-     * 基础包
-     */
-    private String basePackage;
-
-    /**
-     * 版本
-     */
-    private String version;
-
-    /**
-     * 作者
-     */
-    private String author;
-
-
-    /**
-     * 代码生成器产物路径
-     */
-    private String distPath;
-
-    /**
-     * 状态
-     */
-    private Integer status;
     private Long userId;
-
 
     private static final long serialVersionUID = 1L;
 }
