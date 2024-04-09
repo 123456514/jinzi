@@ -43,6 +43,12 @@ export default [
     hideInMenu: true,
   },
   {
+    path: '/myinfo',
+    name: '我的信息',
+    icon: 'UnorderedListOutlined',
+    component: './User/Manage'
+  },
+  {
     path: '/admin',
     icon: 'crown',
     name: "管理页",

@@ -169,7 +169,7 @@ const IndexPage: React.FC = () => {
           {
             key: 'recommend',
             label: '推荐',
-          },
+          }
         ]}
       />
       {showFilter ? (
