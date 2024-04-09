@@ -26,7 +26,8 @@ public interface UserConstant {
     /**
      * 被封号
      */
-    String BAN_ROLE = "ban";
+    String BAN_ROLE = "2";
+    String OPEN_ROLE = "1";
 
     // endregion
 }

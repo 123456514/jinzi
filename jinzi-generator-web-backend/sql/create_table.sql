@@ -139,3 +139,15 @@ create table if not exists generator_favour
     index idx_postId (generatorId),
     index idx_userId (userId)
 ) comment '代码生成器收藏表';
+
+-- 积分表
+create table if not exists score
+(
+    id           bigint auto_increment comment 'id' primary key,
+    userId       bigint                   comment '创建用户id',
+    scoreTotal   bigint null  comment '总积分' default 0,
+    isSign       tinyint    comment '0表示未签到，1表示已签到' default 0,
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
+) comment '积分表' collate = utf8mb4_unicode_ci;

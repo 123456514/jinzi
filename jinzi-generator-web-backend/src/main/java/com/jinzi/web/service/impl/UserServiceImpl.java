@@ -7,13 +7,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.constant.CommonConstant;
+import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
+import com.jinzi.web.exception.ThrowUtils;
 import com.jinzi.web.mapper.UserMapper;
 import com.jinzi.web.model.dto.user.UserQueryRequest;
+import com.jinzi.web.model.entity.Score;
 import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.UserRoleEnum;
 import com.jinzi.web.model.vo.LoginUserVO;
 import com.jinzi.web.model.vo.UserVO;
+import com.jinzi.web.service.ScoreService;
 import com.jinzi.web.service.UserService;
 import com.jinzi.web.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +50,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private ScoreService scoreService;
 
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword, String userEmail, String code) {
@@ -100,11 +106,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             user.setUserAccount(userAccount);
             user.setUserPassword(encryptPassword);
             user.setUserEmail(userEmail);
-            user.setAccountStatus("1");
+            user.setAccountStatus(UserConstant.OPEN_ROLE);
+            user.setUserAvatar("https://img1.baidu.com/it/u=3379946556,946410391&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500");
             boolean saveResult = this.save(user);
             if (!saveResult) {
                 throw new BusinessException(ErrorCode.SYSTEM_ERROR, "注册失败，数据库错误");
             }
+            //注册成功后往Score表插入数据
+            Score score = new Score();
+            //未签到
+            score.setIsSign(0);
+            //初始积分10分
+            score.setScoreTotal(10L);
+            score.setUserId(user.getId());
+            boolean scoreResult = scoreService.save(score);
+            ThrowUtils.throwIf(!scoreResult,ErrorCode.OPERATION_ERROR,"注册积分异常");
             return user.getId();
         }
     }
