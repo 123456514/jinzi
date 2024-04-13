@@ -69,12 +69,14 @@ const UserProfile = () => {
   const handleEditProfile = () => {
     setModalVisible(true);
     form.setFieldsValue({ userName: userData?.data?.userName });
+    form.setFieldsValue({ userProfile: userData?.data?.userProfile });
   };
 
   const handleSaveProfile = async () => {
     try {
       const updatedUserInfo: API.UserUpdateMyRequest = {
         userName: form.getFieldValue('userName'),
+        userProfile: form.getFieldValue('userProfile')
       };
       const updateUserInfo = await updateMyUserUsingPost(updatedUserInfo);
 
