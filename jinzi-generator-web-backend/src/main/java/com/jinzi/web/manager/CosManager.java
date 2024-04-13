@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 /**
  * Cos 对象存储操作
  *
- * @author codeZhang
  */
 @Component
 public class CosManager {

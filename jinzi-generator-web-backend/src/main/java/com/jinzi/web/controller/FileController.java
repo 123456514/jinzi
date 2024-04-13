@@ -112,7 +112,37 @@ public class FileController {
             }
         }
     }
-
+    /**
+     * 测试文件上传
+     *
+     * @deprecated
+     */
+    @PostMapping("/test/upload")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<String> testUploadFile(@RequestPart("file") MultipartFile multipartFile) {
+        // 文件目录：根据业务、用户来划分
+        String filename = multipartFile.getOriginalFilename();
+        String filepath = String.format("/test/%s", filename);
+        File file = null;
+        try {
+            // 上传文件
+            file = File.createTempFile(filepath, null);
+            multipartFile.transferTo(file);
+            cosManager.putObject(filepath, file);
+            return ResultUtils.success(filepath);
+        } catch (Exception e) {
+            log.error("file upload error, filepath = " + filepath, e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
+        } finally {
+            if (file != null) {
+                // 删除临时文件
+                boolean delete = file.delete();
+                if (!delete) {
+                    log.error("file delete error, filepath = {}", filepath);
+                }
+            }
+        }
+    }
     /**
      * 测试文件下载
      *
