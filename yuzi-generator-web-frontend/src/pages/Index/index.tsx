@@ -1,24 +1,22 @@
-import { listGeneratorVoByPageUsingPost } from '@/services/backend/generatorController';
-import { doGeneratorFavourUsingPost } from '@/services/backend/generatorFavourController';
-import { doThumbUsingPost } from '@/services/backend/generatorThumbController';
 import {
-  DownOutlined,
-  LikeFilled,
-  LikeOutlined,
-  StarFilled,
+  listGeneratorVoByPageUsingPost
+} from '@/services/backend/generatorController';
+import {
+  DownOutlined, EditOutlined, EllipsisOutlined, LikeFilled,
+  LikeOutlined, SettingOutlined, StarFilled,
   StarOutlined,
-  UpOutlined,
+  UpOutlined, UserOutlined
 } from '@ant-design/icons';
-import {
-  PageContainer,
-  ProFormSelect,
-  ProFormText,
-  ProList,
-  QueryFilter,
-} from '@ant-design/pro-components';
+import {PageContainer, ProFormSelect, ProFormText, QueryFilter} from '@ant-design/pro-components';
+import '@umijs/max';
 import { Link } from '@umijs/max';
-import { Flex, Image, Input, message, Tabs, Tag } from 'antd';
+import {Alert, Avatar, Card, Flex, Input, List, message, Tabs, Tag, Typography} from 'antd';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+import Marquee from 'react-fast-marquee';
+import {doGeneratorFavourUsingPost} from "@/services/backend/generatorFavourController";
+import {doThumbUsingPost} from "@/services/backend/generatorThumbController";
+import Meta from "antd/es/card/Meta";
 
 const DEFAULT_PAGE_PARAMS: PageRequest = {
   current: 1,
@@ -110,8 +108,36 @@ const IndexPage: React.FC = () => {
     setLoading(false);
   };
 
+  /**
+   * 展示标签列表
+   * @param tags 标签列表
+   */
+  const tagListView = (tags?: string[]) => {
+    if (!tags) {
+      return <></>;
+    }
+
+    return (
+      <div style={{ marginBottom: 8 }}>
+        {tags.map((tag) => (
+          <Tag key={tag}>{tag}</Tag>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <PageContainer title={<></>}>
+      <Alert
+        banner
+        type="success"
+        message={
+          <Marquee pauseOnHover gradient={false}>
+            欢迎各位使用 金子代码生成 ，一起来制作出属于你的代码生成器吧！相信我，利用好这里，一定能够帮助你大幅提高开发效率！
+          </Marquee>
+        }></Alert>
+
+      <div style={{ marginBottom: 16 }} />
       <Flex justify="center">
         <Input.Search
           placeholder="请输入想要查找的生成器"
@@ -192,13 +218,25 @@ const IndexPage: React.FC = () => {
       ) : null}
 
       <div style={{ marginBottom: 12 }}></div>
-      <ProList<API.GeneratorVO>
-        style={{ cursor: 'pointer' }}
+      <List<API.GeneratorVO>
+        rowKey="id"
+        loading={loading}
+        grid={{
+          gutter: 16,
+          xs: 1,
+          sm: 2,
+          md: 3,
+          lg: 3,
+          xl: 4,
+          xxl: 4,
+        }}
+        dataSource={dataList}
         pagination={{
-          pageSize: searchParams.pageSize,
           current: searchParams.current,
-          total,
-          onChange(current, pageSize) {
+          pageSize: searchParams.pageSize,
+          total: total,
+          showSizeChanger: false,
+          onChange(current: number, pageSize: number) {
             setSearchParams({
               ...searchParams,
               current,
@@ -206,91 +244,59 @@ const IndexPage: React.FC = () => {
             });
           },
         }}
-        itemLayout="vertical"
-        rowKey="id"
-        headerTitle=" "
-        dataSource={dataList}
-        metas={{
-          title: {
-            render: (_, entity) => {
-              return (
-                <div style={{ paddingLeft: '10px' }}>
-                  <Link
-                    style={{ color: '#333', fontSize: 18 }}
-                    to={`/generator/detail/${entity.id}`}
-                  >
-                    {entity.name}
-                  </Link>
-                </div>
-              );
-            },
-          },
-          description: {
-            render: (_, entity) => {
-              if (!entity.tags) {
-                return <></>;
-              }
-              return (
-                <div style={{ paddingLeft: '10px' }}>
-                  {entity.tags.map((item, index) => {
-                    return <Tag key={index}>{item}</Tag>;
-                  })}
-                </div>
-              );
-            },
-          },
-          actions: {
-            render: (_, entity) => (
-              <div
-                style={{
-                  paddingLeft: '10px',
-                  marginTop: '15px',
-                  display: 'flex',
-                  gap: '12px',
-                  cursor: 'pointer',
-                }}
-              >
-                <IconText
-                  icon={entity.hasThumb ? LikeFilled : LikeOutlined}
-                  // @ts-ignore
-                  text={entity.thumbNum}
-                  key="list-vertical-like-o"
-                  onClick={() => {
-                    doThumb({
-                      generatorId: entity.id,
-                    });
-                  }}
+        renderItem={(data) => (
+          <List.Item>
+            <Card
+              // style={{ width: 300 }}
+              hoverable cover={<img alt={data.name} src={data.picture} />}
+              actions={[
+                    <IconText
+                      // @ts-ignore
+                      icon={data.hasFavour ? StarFilled : StarOutlined}
+                      // @ts-ignore
+                      text={data.favourNum}
+                      key="list-vertical-star-o"
+                      onClick={() => {
+                        doFavour({
+                          // @ts-ignore
+                          generatorId: data.id,
+                        });
+                      }}
+                    />,
+                    <IconText
+                      // @ts-ignore
+                      icon={data.hasThumb ? LikeFilled : LikeOutlined}
+                      // @ts-ignore
+                      text={data.thumbNum}
+                      key="list-vertical-like-o"
+                      onClick={() => {
+                        doThumb({
+                          // @ts-ignore
+                          generatorId: data.id,
+                        });
+                      }}
+                    />,
+                // eslint-disable-next-line react/jsx-key
+                    <Typography.Paragraph type="secondary" style={{ fontSize: 12 }}>
+                      {moment(data.updateTime).fromNow()}
+                    </Typography.Paragraph>
+              ]}>
+
+              <Link to={`/generator/detail/${data.id}`}>
+                <Meta
+                  title={<a>{data.name}</a>}
+                  description={
+                    <Typography.Paragraph ellipsis={{ rows: 2}} style={{ "height": 44 }}>{data.description}</Typography.Paragraph>
+                  }
+                  // avatar={data.user?.userAvatar ?? <UserOutlined />}
                 />
-                <IconText
-                  icon={entity.hasFavour ? StarFilled : StarOutlined}
-                  // @ts-ignore
-                  text={entity.favourNum}
-                  key="list-vertical-star-o"
-                  onClick={() => {
-                    doFavour({
-                      generatorId: entity.id,
-                    });
-                  }}
-                />
-              </div>
-            ),
-          },
-          extra: {
-            render: (_: any, entity: { name: string | undefined; picture: string | undefined }) => {
-              return (
-                <div style={{ paddingRight: '10px' }}>
-                  {<Image width={220} height={180} alt={entity.name} src={entity.picture} />}
-                </div>
-              );
-            },
-          },
-          content: {
-            render: (_, entity) => {
-              return <div>{entity.description}</div>;
-            },
-          },
-        }}
-      />
+              </Link>
+              {/* 展示标签 */}
+              {tagListView(data.tags)}
+            </Card>
+          </List.Item>
+        )}></List>
+
     </PageContainer>
   );
 };
