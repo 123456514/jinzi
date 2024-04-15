@@ -9,6 +9,7 @@ import com.jinzi.web.mapper.GeneratorThumbMapper;
 import com.jinzi.web.model.entity.Generator;
 import com.jinzi.web.model.entity.GeneratorThumb;
 import com.jinzi.web.model.entity.User;
+import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.GeneratorThumbService;
 import org.springframework.aop.framework.AopContext;
@@ -37,7 +38,7 @@ public class GeneratorThumbServiceImpl extends ServiceImpl<GeneratorThumbMapper,
      * @return
      */
     @Override
-    public int doGeneratorThumb(long generatorId, User loginUser) {
+    public int doGeneratorThumb(long generatorId, UserVO loginUser) {
         // 判断实体是否存在，根据类别获取实体
         Generator generator = generatorService.getById(generatorId);
         if (generator == null) {

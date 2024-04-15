@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * 用户
  *
- * @author codeZhang
+ * @author zhoujin
  */
 @TableName(value = "user")
 @Data
@@ -22,6 +22,16 @@ public class User implements Serializable {
     private Long id;
 
     /**
+     * 用户昵称
+     */
+    private String userName;
+
+    /**
+     * 用户邮箱
+     */
+    private String email;
+
+    /**
      * 用户账号
      */
     private String userAccount;
@@ -32,9 +42,9 @@ public class User implements Serializable {
     private String userPassword;
 
     /**
-     * 用户昵称
+     * 性别
      */
-    private String userName;
+    private String gender;
 
     /**
      * 用户头像
@@ -52,6 +62,16 @@ public class User implements Serializable {
     private String userRole;
 
     /**
+     * 钱包余额（分）
+     */
+    private Integer balance;
+
+    /**
+     * 邀请码
+     */
+    private String invitationCode;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -62,14 +82,10 @@ public class User implements Serializable {
     private Date updateTime;
 
     /**
-     * 用户状态1 正常 2冻结
+     * 账号状态（0- 正常 1- 封号）
      */
-    private String accountStatus;
+    private Integer status;
 
-    /**
-     * 用户邮箱
-     */
-    private String userEmail;
 
     /**
      * 是否删除

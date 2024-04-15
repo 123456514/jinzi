@@ -5,17 +5,22 @@ create database if not exists my_db;
 
 -- 切换库
 use my_db;
-
+delete from user
 -- 用户表
 create table if not exists user
 (
     id           bigint auto_increment comment 'id' primary key,
     userAccount  varchar(256)                           not null comment '账号',
-    userPassword varchar(512)                           not null comment '密码',
+    userPassword   varchar(512)                         null comment '密码',
     userName     varchar(256)                           null comment '用户昵称',
     userAvatar   varchar(1024)                          null comment '用户头像',
     userProfile  varchar(512)                           null comment '用户简介',
+    email          varchar(256)                           null comment '邮箱',
+    gender         varchar(10)                            null comment '性别 0-男 1-女',
     userRole     varchar(256) default 'user'            not null comment '用户角色：user/admin/ban',
+    balance        bigint       default 30                not null comment '钱包余额,注册送30币',
+    invitationCode varchar(256)                           null comment '邀请码',
+    status         tinyint      default 0                 not null comment '账号状态（0- 正常 1- 封号）',
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',
@@ -48,73 +53,26 @@ create table if not exists generator
     index idx_userId (userId)
 ) comment '代码生成器' collate = utf8mb4_unicode_ci;
 
--- 模拟用户数据
-INSERT INTO my_db.user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (1, 'zhoujin', 'b0dd3697a192885d7c055db46155b26a', '测试开发工程师周津', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
-INSERT INTO my_db.user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole) VALUES (2, 'zhoujin2', 'b0dd3697a192885d7c055db46155b26a', '普通金子', 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
-
-
 INSERT INTO  generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
                                      modelConfig, distPath, status, userId)
-VALUES (1, 'ACM 模板项目', 'ACM 模板项目生成器', 'com.jinzi', '1.0', '小周', '["Java"]',
+VALUES (1, 'ACM 模板项目', 'ACM 模板项目生成器', 'com.azhang', '1.0', '小张', '["Java"]',
         'https://pic.yupi.icu/1/_r0_c1851-bf115939332e.jpg', '{}', '{}', null, 0, 1);
-INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
+INSERT INTO  generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
                                      modelConfig, distPath, status, userId)
-VALUES (2, 'Spring Boot 初始化模板', 'Spring Boot 初始化模板项目生成器', 'com.jinzi', '1.0', '小周', '["Java"]',
+VALUES (2, 'Spring Boot 初始化模板', 'Spring Boot 初始化模板项目生成器', 'com.azhang', '1.0', '小张', '["Java"]',
         'https://pic.yupi.icu/1/_r0_c0726-7e30f8db802a.jpg', '{}', '{}', null, 0, 1);
-INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
+INSERT INTO  generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
                                      modelConfig, distPath, status, userId)
-VALUES (3, '阿津外卖', '阿津外卖项目生成器', 'com.jinzi', '1.0', '小周', '["Java", "前端"]',
+VALUES (3, '阿张外卖', '阿张外卖项目生成器', 'com.azhang', '1.0', '小张', '["Java", "前端"]',
         'https://pic.yupi.icu/1/_r1_c0cf7-f8e4bd865b4b.jpg', '{}', '{}', null, 0, 1);
-INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
+INSERT INTO  generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
                                      modelConfig, distPath, status, userId)
-VALUES (4, '阿津用户中心', '阿津用户中心项目生成器', 'com.jinzi', '1.0', '小周', '["Java", "前端"]',
+VALUES (4, '阿张用户中心', '阿张用户中心项目生成器', 'com.azhang', '1.0', '小张', '["Java", "前端"]',
         'https://pic.yupi.icu/1/_r1_c1c15-79cdecf24aed.jpg', '{}', '{}', null, 0, 1);
 INSERT INTO generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
                                      modelConfig, distPath, status, userId)
-VALUES (5, '阿津商城', '阿津商城项目生成器', 'com.jinzi', '1.0', '小周', '["Java", "前端"]',
+VALUES (5, '阿张商城', '阿张商城项目生成器', 'com.azhang', '1.0', '小张', '["Java", "前端"]',
         'https://pic.yupi.icu/1/_r1_c0709-8e80689ac1da.jpg', '{}', '{}', null, 0, 1);
-
-/*
- Navicat Premium Data Transfer
-
- Source Server         : localhost
- Source Server Type    : MySQL
- Source Server Version : 50743
- Source Host           : localhost:3306
- Source Schema         : code_generate
-
- Target Server Type    : MySQL
- Target Server Version : 50743
- File Encoding         : 65001
-
- Date: 18/03/2024 14:32:28
-*/
-
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
-
--- ----------------------------
--- Table structure for user
--- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user`  (
-                         `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-                         `userAccount` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '账号',
-                         `userPassword` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '密码',
-                         `userName` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户昵称',
-                         `userAvatar` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户头像',
-                         `userProfile` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户简介',
-                         `userRole` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user' COMMENT '用户角色：user/admin/ban',
-                         `createTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '创建时间',
-                         `updateTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '更新时间',
-                         `isDelete` tinyint(4) NOT NULL DEFAULT 0 COMMENT '是否删除',
-                         `userEmail` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户邮箱',
-                         `accountStatus` varchar(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '1 正常 2冻结',
-                         PRIMARY KEY (`id`) USING BTREE,
-                         INDEX `idx_unionId`(`userAccount`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1754500716679798787 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户' ROW_FORMAT = Dynamic;
-
-SET FOREIGN_KEY_CHECKS = 1;
 
 -- 代码生成器点赞表（硬删除）
 create table if not exists generator_thumb
@@ -151,3 +109,94 @@ create table if not exists score
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除'
 ) comment '积分表' collate = utf8mb4_unicode_ci;
+
+
+
+-- 每日签到表
+create table if not exists daily_check_in
+(
+    id          bigint auto_increment comment 'id' primary key,
+    userId      bigint                             not null comment '签到人',
+    description varchar(256)                       null comment '描述',
+    addPoints   bigint   default 10                not null comment '签到增加积分个数',
+    createTime  datetime default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime  datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '每日签到表';
+
+
+-- 产品信息
+create table if not exists product_info
+(
+    id             bigint auto_increment comment 'id' primary key,
+    name           varchar(256)                           not null comment '产品名称',
+    description    varchar(256)                           null comment '产品描述',
+    userId         bigint                                 null comment '创建人',
+    total          bigint                                 null comment '金额(分)',
+    addPoints      bigint       default 0                 not null comment '增加积分个数',
+    productType    varchar(256) default 'RECHARGE'        not null comment '产品类型（VIP-会员 RECHARGE-充值,RECHARGEACTIVITY-充值活动）',
+    status         tinyint      default 0                 not null comment '商品状态（0- 默认下线 1- 上线）',
+    expirationTime datetime                               null comment '过期时间',
+    createTime     datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime     datetime     default CURRENT_TIMESTAMP not null comment '更新时间',
+    isDelete       tinyint      default 0                 not null comment '是否删除'
+)
+    comment '产品信息';
+
+-- 产品订单
+create table if not exists product_order
+(
+    id             bigint auto_increment comment 'id' primary key,
+    orderNo        varchar(256)                           not null comment '订单号',
+    codeUrl        varchar(256)                           null comment '二维码地址',
+    userId         bigint                                 not null comment '创建人',
+    productId      bigint                                 not null comment '商品id',
+    orderName      varchar(256)                           not null comment '商品名称',
+    total          bigint                                 not null comment '金额(分)',
+    status         varchar(256) default 'NOTPAY'          not null comment '交易状态(SUCCESS：支付成功 REFUND：转入退款 NOTPAY：未支付 CLOSED：已关闭 REVOKED：已撤销（仅付款码支付会返回）
+                                                                              USERPAYING：用户支付中（仅付款码支付会返回）PAYERROR：支付失败（仅付款码支付会返回）)',
+    payType        varchar(256) default 'WX'              not null comment '支付方式（默认 WX- 微信 ZFB- 支付宝）',
+    productInfo    text                                   null comment '商品信息',
+    formData       text                                   null comment '支付宝formData',
+    addPoints      bigint       default 0                 not null comment '增加积分个数',
+    expirationTime datetime                               null comment '过期时间',
+    createTime     datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime     datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '商品订单';
+
+
+
+
+-- 付款信息
+create table if not exists  payment_info
+(
+    id             bigint auto_increment comment 'id' primary key,
+    orderNo        varchar(256)                           null comment '商户订单号',
+    transactionId  varchar(256)                           null comment '微信支付订单号',
+    tradeType      varchar(256)                           null comment '交易类型',
+    tradeState     varchar(256)                           null comment '交易状态(SUCCESS：支付成功 REFUND：转入退款 NOTPAY：未支付 CLOSED：已关闭 REVOKED：已撤销（仅付款码支付会返回）
+                                                                              USERPAYING：用户支付中（仅付款码支付会返回）PAYERROR：支付失败（仅付款码支付会返回）)',
+    tradeStateDesc varchar(256)                           null comment '交易状态描述',
+    successTime    varchar(256)                           null comment '支付完成时间',
+    openid         varchar(256)                           null comment '用户标识',
+    payerTotal     bigint                                 null comment '用户支付金额',
+    currency       varchar(256) default 'CNY'             null comment '货币类型',
+    payerCurrency  varchar(256) default 'CNY'             null comment '用户支付币种',
+    content        text                                   null comment '接口返回内容',
+    total          bigint                                 null comment '总金额(分)',
+    createTime     datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime     datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间'
+)
+    comment '付款信息';
+
+
+
+
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695338876708544514, '100坤币', '增加100坤币到钱包', 1691069533871013889, 1, 100, 'RECHARGEACTIVITY', 1, null, '2023-08-26 15:34:20', '2023-08-28 12:58:30', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695773972037839073, '9999坤币', '增加9999坤币到钱包', 1691069533871013889, 699, 9999, 'RECHARGE', 1, '2023-08-28 13:01:34', '2023-08-27 20:35:34', '2023-08-27 20:41:29', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695776766919888897, '1000坤币', '增加1000坤币到钱包', 1691069533871013889, 99, 1000, 'RECHARGE', 1, null, '2023-08-27 20:34:21', '2023-08-27 20:34:21', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695777072030339073, '3000坤币', '增加3000坤币到钱包', 1691069533871013889, 199, 3000, 'RECHARGE', 1, null, '2023-08-27 20:35:34', '2023-08-27 20:41:29', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695777203236556802, '15999坤币', '增加15999坤币到钱包', 1691069533871013889, 888, 15999, 'RECHARGE', 1, null, '2023-08-27 20:36:05', '2023-08-28 13:02:25', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695778320091631617, '18999坤币', '增加18999坤币到钱包', 1691069533871013889, 999, 18999, 'RECHARGE', 1, null, '2023-08-27 20:40:32', '2023-08-28 13:02:42', 0);
+INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1697087470134259713, '10坤币', '签到获取', 1692848556158709762, 0, 10, 'RECHARGE', 0, null, '2023-08-31 11:22:37', '2023-08-31 11:22:37', 1);

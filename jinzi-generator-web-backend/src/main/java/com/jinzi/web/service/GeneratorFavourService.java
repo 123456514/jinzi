@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.jinzi.web.model.entity.Generator;
 import com.jinzi.web.model.entity.GeneratorFavour;
 import com.jinzi.web.model.entity.User;
+import com.jinzi.web.model.vo.UserVO;
 
 /**
  * 代码生成器收藏服务
@@ -22,7 +23,7 @@ public interface GeneratorFavourService extends IService<GeneratorFavour> {
      * @param loginUser
      * @return
      */
-    int doGeneratorFavour(long postId, User loginUser);
+    int doGeneratorFavour(long postId, UserVO loginUser);
 
     /**
      * 分页获取用户收藏的代码生成器列表

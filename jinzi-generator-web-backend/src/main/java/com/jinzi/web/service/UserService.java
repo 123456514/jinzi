@@ -2,7 +2,7 @@ package com.jinzi.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.jinzi.web.model.dto.user.UserQueryRequest;
+import com.jinzi.web.model.dto.user.*;
 import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.LoginUserVO;
 import com.jinzi.web.model.vo.UserVO;
@@ -18,15 +18,15 @@ public interface UserService extends IService<User> {
 
     /**
      * 用户注册
-     *
-     * @param userAccount   用户账户
-     * @param userPassword  用户密码
-     * @param checkPassword 校验密码
-     * @param userEmail 用户邮箱
-     * @param code 验证码
-     * @return 新用户 id
      */
-    long userRegister(String userAccount, String userPassword, String checkPassword,String userEmail,String code);
+    long userRegister(UserRegisterRequest userRegisterRequest);
+    /**
+     * 用户电子邮件注册
+     *
+     * @param userEmailRegisterRequest 用户电子邮件注册请求
+     * @return long
+     */
+    long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest);
 
 
     /**
@@ -38,6 +38,14 @@ public interface UserService extends IService<User> {
      * @return 脱敏后的用户信息
      */
     LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
+    /**
+     * 用户电子邮件登录
+     *
+     * @param userEmailLoginRequest 用户电子邮件登录请求
+     * @param request               要求
+     * @return {@link UserVO}
+     */
+    UserVO userEmailLogin(UserEmailLoginRequest userEmailLoginRequest, HttpServletRequest request);
 
 
 
@@ -47,7 +55,7 @@ public interface UserService extends IService<User> {
      * @param request
      * @return
      */
-    User getLoginUser(HttpServletRequest request);
+    UserVO getLoginUser(HttpServletRequest request);
 
     /**
      * 获取当前登录用户（允许未登录）
@@ -71,7 +79,7 @@ public interface UserService extends IService<User> {
      * @param user
      * @return
      */
-    boolean isAdmin(User user);
+    boolean isAdmin(UserVO user);
 
     /**
      * 用户注销
@@ -111,5 +119,38 @@ public interface UserService extends IService<User> {
      * @return
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+    /**
+     * 添加钱包余额
+     *
+     * @param userId    用户id
+     * @param addPoints 添加点
+     * @return boolean
+     */
+    boolean addWalletBalance(Long userId, Integer addPoints);
+
+    /**
+     * 用户绑定电子邮件
+     *
+     * @param userEmailLoginRequest 用户电子邮件登录请求
+     * @param request               要求
+     * @return {@link UserVO}
+     */
+    UserVO userBindEmail(UserBindEmailRequest userEmailLoginRequest, HttpServletRequest request);
+
+    /**
+     * 用户取消绑定电子邮件
+     *
+     * @param request                要求
+     * @param userUnBindEmailRequest 用户取消绑定电子邮件请求
+     * @return {@link UserVO}
+     */
+    UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request);
+    /**
+     * 校验
+     *
+     * @param add  是否为创建校验
+     * @param user 接口信息
+     */
+    void validUser(User user, boolean add);
 
 }

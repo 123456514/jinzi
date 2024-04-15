@@ -5,6 +5,7 @@ import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.UserRoleEnum;
+import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -42,7 +43,7 @@ public class AuthInterceptor {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         // 当前登录用户
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         // 必须有该权限才通过
         if (StringUtils.isNotBlank(mustRole)) {
             UserRoleEnum mustUserRoleEnum = UserRoleEnum.getEnumByValue(mustRole);

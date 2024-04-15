@@ -164,17 +164,17 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         User loginUser = userService.getLoginUserPermitNull(request);
         if (loginUser != null) {
             Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
-            loginUser = userService.getLoginUser(request);
+            UserVO login  = userService.getLoginUser(request);
             // 获取点赞
             QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
             generatorThumbQueryWrapper.in("generatorId", generatorIdSet);
-            generatorThumbQueryWrapper.eq("userId", loginUser.getId());
+            generatorThumbQueryWrapper.eq("userId", login.getId());
             List<GeneratorThumb> generatorGeneratorThumbList = generatorThumbMapper.selectList(generatorThumbQueryWrapper);
             generatorGeneratorThumbList.forEach(generatorGeneratorThumb -> generatorIdHasThumbMap.put(generatorGeneratorThumb.getGeneratorId(), true));
             // 获取收藏
             QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
             generatorFavourQueryWrapper.in("generatorId", generatorIdSet);
-            generatorFavourQueryWrapper.eq("userId", loginUser.getId());
+            generatorFavourQueryWrapper.eq("userId", login.getId());
             List<GeneratorFavour> generatorFavourList = generatorFavourMapper.selectList(generatorFavourQueryWrapper);
             generatorFavourList.forEach(generatorFavour -> generatorIdHasFavourMap.put(generatorFavour.getGeneratorId(), true));
         }

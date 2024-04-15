@@ -3,11 +3,15 @@ export default [
     path: '/user',
     layout: false,
     routes: [
-      { path: '/user/login', component: './User/Login' },
-      { path: '/user/register', component: './User/Register' }
+      {name: '登录', path: '/user/login', component: './User/Login' },
+      { name: '注册账号', path: '/user/register', component: './User/Register' }
     ]
   },
-  { path: '/', icon: 'home', component: './Index', name: "主页" },
+  { path: '/', name: '欢迎', icon: 'smile', component: './Welcome' },
+
+  { path: '/list/page/vo', icon: 'home', component: './Index', name: "主页" },
+  { path: '/recharge/list', icon: 'PayCircleOutlined', name: '积分商城', component: './Recharge' },
+  { path: '/order/list', name: '我的订单', icon: 'ProfileOutlined', component: './Order/OrderList',},
   {
     path: '/generator/add',
     icon: 'plus',
@@ -43,12 +47,6 @@ export default [
     hideInMenu: true,
   },
   {
-    path: '/myinfo',
-    name: '我的信息',
-    icon: 'UnorderedListOutlined',
-    component: './User/Manage'
-  },
-  {
     path: '/admin',
     icon: 'crown',
     name: "管理页",
@@ -59,6 +57,12 @@ export default [
       { icon: 'tools', path: '/admin/generator', component: './Admin/Generator', name: "生成器管理" },
     ],
   },
-  { path: '/', redirect: '/welcome' },
+  {
+    path: '/account/center',
+    name: '个人中心',
+    icon: 'UserOutlined',
+    component: './User/UserInfo',
+    hideInMenu: true,
+  },
   { path: '*', layout: false, component: './404' },
 ];

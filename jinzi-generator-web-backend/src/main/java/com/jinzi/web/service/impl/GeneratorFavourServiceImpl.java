@@ -12,6 +12,7 @@ import com.jinzi.web.mapper.GeneratorFavourMapper;
 import com.jinzi.web.model.entity.Generator;
 import com.jinzi.web.model.entity.GeneratorFavour;
 import com.jinzi.web.model.entity.User;
+import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorFavourService;
 import com.jinzi.web.service.GeneratorService;
 import org.springframework.aop.framework.AopContext;
@@ -40,7 +41,7 @@ public class GeneratorFavourServiceImpl extends ServiceImpl<GeneratorFavourMappe
      * @return
      */
     @Override
-    public int doGeneratorFavour(long generatorId, User loginUser) {
+    public int doGeneratorFavour(long generatorId, UserVO loginUser) {
         // 判断是否存在
         Generator generator = generatorService.getById(generatorId);
         if (generator == null) {

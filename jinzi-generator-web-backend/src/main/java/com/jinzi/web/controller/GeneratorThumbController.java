@@ -7,6 +7,7 @@ import com.jinzi.web.common.ResultUtils;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.model.dto.generatorthumb.GeneratorThumbAddRequest;
 import com.jinzi.web.model.entity.User;
+import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorThumbService;
 import com.jinzi.web.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +49,7 @@ public class GeneratorThumbController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能点赞
-        final User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         long generatorId = generatorThumbAddRequest.getGeneratorId();
         int result = generatorThumbService.doGeneratorThumb(generatorId, loginUser);
         return ResultUtils.success(result);

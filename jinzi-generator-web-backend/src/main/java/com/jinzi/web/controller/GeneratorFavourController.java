@@ -13,6 +13,7 @@ import com.jinzi.web.model.dto.generatorfavour.GeneratorFavourQueryRequest;
 import com.jinzi.web.model.entity.Generator;
 import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.GeneratorVO;
+import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorFavourService;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.UserService;
@@ -58,7 +59,7 @@ public class GeneratorFavourController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能操作
-        final User loginUser = userService.getLoginUser(request);
+        final UserVO loginUser = userService.getLoginUser(request);
         long generatorId = generatorFavourAddRequest.getGeneratorId();
         int result = generatorFavourService.doGeneratorFavour(generatorId, loginUser);
         return ResultUtils.success(result);
@@ -76,7 +77,7 @@ public class GeneratorFavourController {
         if (generatorQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getLoginUser(request);
+        UserVO loginUser = userService.getLoginUser(request);
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫

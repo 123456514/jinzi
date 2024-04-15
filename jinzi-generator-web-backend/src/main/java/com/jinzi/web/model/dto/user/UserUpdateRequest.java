@@ -34,6 +34,22 @@ public class UserUpdateRequest implements Serializable {
      * 用户角色：user/admin/ban
      */
     private String userRole;
+    /**
+     * 性别
+     */
+    private String gender;
+    /**
+     * 账号状态（0- 正常 1- 封号）
+     */
+    private Integer status;
+    /**
+     * 密码
+     */
+    private String userPassword;
+    /**
+     * 钱包余额（分）
+     */
+    private Integer balance;
 
     private static final long serialVersionUID = 1L;
 }
