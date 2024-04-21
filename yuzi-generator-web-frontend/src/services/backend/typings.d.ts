@@ -65,7 +65,7 @@ declare namespace API {
     message?: string;
   };
 
-  type BaseResponseUserVO_ = {
+  type BaseResponseUserVO = {
     code?: number;
     data?: UserVO;
     message?: string;
@@ -85,9 +85,6 @@ declare namespace API {
     id?: number;
   };
 
-  type EmailVo = {
-    userEmail?: string;
-  };
 
   type FileConfigDTO = {
     files?: FileInfoDTO[];
@@ -146,6 +143,10 @@ declare namespace API {
     versionControl?: boolean;
   };
 
+
+  type getCaptchaUsingGETParams = {
+    emailAccount?: string;
+  };
   type GeneratorEditRequest = {
     author?: string;
     basePackage?: string;
@@ -416,11 +417,16 @@ declare namespace API {
   };
 
   type UserUpdateRequest = {
+    balance?: number;
+    gender?: string;
     id?: number;
     userAvatar?: string;
     userName?: string;
     userProfile?: string;
     userRole?: string;
+    status?: number;
+    userAccount?: string;
+    userPassword?: string;
   };
 
   type UserVO = {
@@ -430,5 +436,213 @@ declare namespace API {
     userName?: string;
     userProfile?: string;
     userRole?: string;
+    balance?: number;
+    email?: string;
+    gender?: string;
+    invitationCode?: string;
+    status?: number;
+    userAccount?: string;
   };
+  type UserBindEmailRequest = {
+    captcha?: string;
+    emailAccount?: string;
+  };
+  type UserUnBindEmailRequest = {
+    captcha?: string;
+    emailAccount?: string;
+  };
+  type getUserByInvitationCodeUsingPOSTParams = {
+    /** invitationCode */
+    invitationCode?: string;
+  };
+  type UserEmailRegisterRequest = {
+    agreeToAnAgreement?: string;
+    captcha?: string;
+    emailAccount?: string;
+    invitationCode?: string;
+    userName?: string;
+  };
+  type UserEmailLoginRequest = {
+    captcha?: string;
+    emailAccount?: string;
+  };
+  type BaseResponseImageVo = {
+    code?: number;
+    data?: ImageVo;
+    message?: string;
+  };
+  type ImageVo = {
+    name?: string;
+    status?: string;
+    uid?: string;
+    url?: string;
+  };
+  type ProductInfoAddRequest = {
+    addPoints?: number;
+    description?: string;
+    expirationTime?: string;
+    name?: string;
+    productType?: string;
+    total?: number;
+  };
+  type getProductInfoByIdUsingGETParams = {
+    /** id */
+    id?: number;
+  };
+  type BaseResponseProductInfo = {
+    code?: number;
+    data?: ProductInfo;
+    message?: string;
+  };
+  type listProductInfoBySearchTextPageUsingGETParams = {
+    current?: number;
+    pageSize?: number;
+    searchText?: string;
+    sortField?: string;
+    sortOrder?: string;
+  };
+  type BaseResponsePageProductInfo = {
+    code?: number;
+    data?: PageProductInfo;
+    message?: string;
+  };
+  type ProductInfoUpdateRequest = {
+    addPoints?: number;
+    description?: string;
+    expirationTime?: string;
+    id?: number;
+    name?: string;
+    productType?: string;
+    total?: number;
+  };
+  type IdRequest = {
+    id?: number;
+  };
+  type listProductInfoByPageUsingGETParams = {
+    addPoints?: number;
+    current?: number;
+    description?: string;
+    name?: string;
+    pageSize?: number;
+    productType?: string;
+    sortField?: string;
+    sortOrder?: string;
+    total?: number;
+  };
+  type BaseResponseListProductInfo = {
+    code?: number;
+    data?: ProductInfo[];
+    message?: string;
+  };
+  type listProductInfoUsingGETParams = {
+    addPoints?: number;
+    current?: number;
+    description?: string;
+    name?: string;
+    pageSize?: number;
+    productType?: string;
+    sortField?: string;
+    sortOrder?: string;
+    total?: number;
+  };
+  type ProductInfo = {
+    addPoints?: number;
+    createTime?: string;
+    description?: string;
+    expirationTime?: string;
+    id?: number;
+    isDelete?: number;
+    name?: string;
+    productType?: string;
+    status?: number;
+    total?: number;
+    updateTime?: string;
+    userId?: number;
+  };
+  type closedProductOrderUsingPOSTParams = {
+    /** orderNo */
+    orderNo?: string;
+  };
+  type PayCreateRequest = {
+    payType?: string;
+    productId?: string;
+  };
+  type BaseResponseProductOrderVo = {
+    code?: number;
+    data?: ProductOrderVo;
+    message?: string;
+  };
+  type deleteProductOrderUsingPOSTParams = {
+    /** id */
+    id?: number;
+  };
+  type getProductOrderByIdUsingGETParams = {
+    /** id */
+    id?: string;
+  };
+  type listProductOrderByPageUsingGETParams = {
+    addPoints?: number;
+    current?: number;
+    orderName?: string;
+    orderNo?: string;
+    pageSize?: number;
+    payType?: string;
+    productInfo?: string;
+    sortField?: string;
+    sortOrder?: string;
+    status?: string;
+    total?: number;
+  };
+  type BaseResponseOrderVo = {
+    code?: number;
+    data?: OrderVo;
+    message?: string;
+  };
+  type ProductOrderQueryRequest = {
+    addPoints?: number;
+    current?: number;
+    orderName?: string;
+    orderNo?: string;
+    pageSize?: number;
+    payType?: string;
+    productInfo?: string;
+    sortField?: string;
+    sortOrder?: string;
+    status?: string;
+    total?: number;
+  };
+  type ProductOrderVo = {
+    addPoints?: number;
+    codeUrl?: string;
+    createTime?: string;
+    description?: string;
+    expirationTime?: string;
+    formData?: string;
+    id?: number;
+    orderName?: string;
+    orderNo?: string;
+    payType?: string;
+    productId?: number;
+    productInfo?: ProductInfo;
+    productType?: string;
+    status?: string;
+    total?: string;
+  };
+  type listUserByPageUsingGETParams = {
+    current?: number;
+    gender?: string;
+    id?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    userAccount?: string;
+    userName?: string;
+    userRole?: string;
+  };
+  type BaseResponsePageUserVO = {
+    code?: number;
+    data?: PageUserVO;
+    message?: string;
+  };
+
 }

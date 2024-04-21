@@ -2,15 +2,15 @@ import {
   listGeneratorVoByPageUsingPost
 } from '@/services/backend/generatorController';
 import {
-  DownOutlined, EditOutlined, EllipsisOutlined, LikeFilled,
-  LikeOutlined, SettingOutlined, StarFilled,
+  DownOutlined, LikeFilled,
+  LikeOutlined, StarFilled,
   StarOutlined,
-  UpOutlined, UserOutlined
+  UpOutlined
 } from '@ant-design/icons';
 import {PageContainer, ProFormSelect, ProFormText, QueryFilter} from '@ant-design/pro-components';
 import '@umijs/max';
 import { Link } from '@umijs/max';
-import {Alert, Avatar, Card, Flex, Input, List, message, Tabs, Tag, Typography} from 'antd';
+import {Alert, Card, Flex, Input, List, message, Tabs, Tag, Typography} from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import Marquee from 'react-fast-marquee';
@@ -288,7 +288,6 @@ const IndexPage: React.FC = () => {
                   description={
                     <Typography.Paragraph ellipsis={{ rows: 2}} style={{ "height": 44 }}>{data.description}</Typography.Paragraph>
                   }
-                  // avatar={data.user?.userAvatar ?? <UserOutlined />}
                 />
               </Link>
               {/* 展示标签 */}

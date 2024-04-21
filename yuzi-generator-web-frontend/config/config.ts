@@ -133,8 +133,8 @@ export default defineConfig({
       projectName: 'backend',
     },
   ],
-  mfsu: {
-    strategy: 'normal',
-  },
+  // mfsu: {
+  //   strategy: 'normal',
+  // },
   requestRecord: {},
 });

@@ -13,6 +13,7 @@ import { saveAs } from 'file-saver';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
+
 /**
  * 生成器详情页
  * @constructor
@@ -23,8 +24,8 @@ const GeneratorDetailPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<API.GeneratorVO>({});
   const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState ?? {};
-  const my = currentUser?.id === data?.userId;
+  const { loginUser } = initialState ?? {};
+  const my = loginUser?.id === data?.id;
 
   /**
    * 加载数据
@@ -70,7 +71,7 @@ const GeneratorDetailPage: React.FC = () => {
   /**
    * 下载按钮
    */
-  const downloadButton = data.distPath && currentUser && (
+  const downloadButton = data.distPath && loginUser && (
     <Button
       icon={<DownloadOutlined />}
       onClick={async () => {

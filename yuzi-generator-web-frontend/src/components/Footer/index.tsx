@@ -1,10 +1,11 @@
-import { GithubOutlined } from '@ant-design/icons';
+import {GithubOutlined, WechatOutlined} from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-components';
 import '@umijs/max';
 import React from 'react';
-
+import {Tooltip} from "antd";
+import wechat from "@/assets/WeChat.png"
 const Footer: React.FC = () => {
-  const defaultMessage = '测试开发工程师周津';
+  const defaultMessage = '测试开发工程师 周津';
   const currentYear = new Date().getFullYear();
   return (
     <DefaultFooter
@@ -14,25 +15,23 @@ const Footer: React.FC = () => {
       copyright={`${currentYear} ${defaultMessage}`}
       links={[
         {
-          key: 'codeNav',
-          title: '我的编程知识圈子',
-          href: 'https://yupi.icu',
-          blankTarget: true,
-        },
-        {
-          key: 'Ant Design',
-          title: '编程宝典',
-          href: 'https://codefather.cn',
-          blankTarget: true,
-        },
-        {
           key: 'github',
           title: (
-            <>
-              <GithubOutlined /> 金子源码
-            </>
+            <Tooltip title="查看本站技术及源码，欢迎 star">
+              <GithubOutlined/> 支持项目
+            </Tooltip>
           ),
-          href: 'https://github.com/liyupi',
+          href: 'https://github.com/123456514/jinzi',
+          blankTarget: true,
+        },
+        {
+          key: 'contact',
+          title: (
+            <Tooltip title={<img src={wechat} alt="微信 code_nav" width="120"/>}>
+              <WechatOutlined/> 联系作者
+            </Tooltip>
+          ),
+          href: 'https://img.qimuu.icu/typory/WeChat.jpg',
           blankTarget: true,
         },
       ]}

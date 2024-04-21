@@ -1,23 +1,40 @@
 import Footer from '@/components/Footer';
-import { sendVerificationCodeUsingPost } from '@/services/backend/reCaptchaController';
-import { userRegisterUsingPost as userRegister } from '@/services/backend/userController';
-import { LockOutlined, SafetyOutlined, UserOutlined } from '@ant-design/icons';
-import { LoginForm, ProFormText } from '@ant-design/pro-components';
-import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { Helmet, history } from '@umijs/max';
-import { Button, message, Tabs } from 'antd';
-import React, { useState } from 'react';
-import { Link } from 'umi';
+import {
+  getCaptchaUsingGET,
+  userEmailRegisterUsingPOST,
+  userRegisterUsingPOST
+} from '@/services/backend/userController';
+import {Link, useParams} from '@@/exports';
+import {
+  LinkOutlined,
+  LockOutlined,
+  MailOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import {LoginForm, ProFormCheckbox, ProFormText} from '@ant-design/pro-components';
+import {useEmotionCss} from '@ant-design/use-emotion-css';
+import {Helmet, history} from '@umijs/max';
+import {Form, message, Tabs} from 'antd';
+import React, {useEffect, useState} from 'react';
 import Settings from '../../../../config/defaultSettings';
+import {ProFormCaptcha} from "@ant-design/pro-form";
 
 const Register: React.FC = () => {
-  const [type, setType] = useState<string>('account');
+  const [type, setType] = useState<string>('email');
+  const [invitationCode, setInvitationCode] = useState<string>('');
+  const [form] = Form.useForm();
+  const params = useParams()
 
-  const [email, setEmail] = useState<string>('');
+  useEffect(() => {
+    if (params.id) {
+      setInvitationCode(params.id);
+      form.setFieldsValue(invitationCode)
+    }
+  }, [params.id]);
 
-  const [isSending, setIsSending] = useState(false);
-  const [countdown, setCountdown] = useState(0);
-
+  useEffect(() => {
+    form.setFieldsValue({invitationCode});
+  }, [invitationCode]);
   const containerClassName = useEmotionCss(() => {
     return {
       display: 'flex',
@@ -30,53 +47,38 @@ const Register: React.FC = () => {
     };
   });
 
+  const doRegister = (res: any) => {
+    if (res.data && res.code === 0) {
+      message.success('注册成功');
+      setTimeout(() => {
+        history.push('/user/login');
+      }, 100);
+    }
+  }
+
   const handleSubmit = async (values: API.UserRegisterRequest) => {
     try {
-      // 注册
-      await userRegister({
+      // 登录
+      const res = await userRegisterUsingPOST({
         ...values,
       });
-      const defaultRegisterSuccessMessage = '注册成功！';
-      message.success(defaultRegisterSuccessMessage);
-      // 注册成功后跳转到登录页面
-      history.push('/user/login');
-      return;
-    } catch (error: any) {
-      const defaultRegisterFailureMessage = `注册失败，${error.message}`;
-      message.error(defaultRegisterFailureMessage);
+      doRegister(res)
+    } catch (error) {
+      const defaultLoginFailureMessage = '注册失败，请重试！';
+      message.error(defaultLoginFailureMessage);
     }
   };
 
-  // 倒计时函数
-  const startCountdown = () => {
-    const interval = setInterval(() => {
-      setCountdown((prevCountdown) => {
-        if (prevCountdown > 1) {
-          return prevCountdown - 1;
-        } else {
-          setIsSending(false);
-          clearInterval(interval);
-          return 0;
-        }
-      });
-    }, 1000);
-    // 组件卸载时清除倒计时
-    return () => clearInterval(interval);
-  };
-
-  const buttonText = isSending ? (countdown ? `${countdown}s 后重发` : '发送中...') : '获取验证码';
-
-  const handleSendCode = async (e: any) => {
-    e.preventDefault();
-    setIsSending(true);
+  const handleEmailSubmit = async (values: API.UserEmailRegisterRequest) => {
     try {
-      await sendVerificationCodeUsingPost({ userEmail: email });
-      setCountdown(10);
-      startCountdown();
-      message.success('发送成功');
-    } catch (error: any) {
-      setIsSending(false);
-      message.error(error.message);
+      // 登录
+      const res = await userEmailRegisterUsingPOST({
+        ...values,
+      });
+      doRegister(res)
+    } catch (error) {
+      const defaultLoginFailureMessage = '注册失败，请重试！';
+      message.error(defaultLoginFailureMessage);
     }
   };
 
@@ -84,7 +86,7 @@ const Register: React.FC = () => {
     <div className={containerClassName}>
       <Helmet>
         <title>
-          {'注册'}- {Settings.title}
+          {'注册账号'}- {Settings.title}
         </title>
       </Helmet>
       <div
@@ -93,24 +95,30 @@ const Register: React.FC = () => {
           padding: '32px 0',
         }}
       >
-        <LoginForm<API.UserRegisterRequest>
+        <LoginForm
+          form={form}
+          submitter={
+            {
+              searchConfig: {
+                submitText: "注册"
+              }
+            }}
           contentStyle={{
             minWidth: 280,
             maxWidth: '75vw',
           }}
           logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
-          title="金子代码生成"
+          title="金子 代码生成"
           subTitle={'开发者的得力助手，让代码生成变得简单、快捷。'}
           initialValues={{
-            autoRegister: true,
-          }}
-          submitter={{
-            searchConfig: {
-              submitText: '注册',
-            },
+            invitationCode: invitationCode
           }}
           onFinish={async (values) => {
-            await handleSubmit(values as API.UserRegisterRequest);
+            if (type === "account") {
+              await handleSubmit(values as API.UserRegisterRequest);
+            } else {
+              await handleEmailSubmit(values as API.UserEmailRegisterRequest);
+            }
           }}
         >
           <Tabs
@@ -119,18 +127,30 @@ const Register: React.FC = () => {
             centered
             items={[
               {
+                key: 'email',
+                label: '邮箱账号注册',
+              },
+              {
                 key: 'account',
-                label: '新用户注册',
+                label: '平台账号注册',
               },
             ]}
           />
           {type === 'account' && (
             <>
               <ProFormText
-                name="userAccount"
+                name="userName"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
+                }}
+                placeholder={'请输入昵称'}
+              />
+              <ProFormText
+                name="userAccount"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined/>,
                 }}
                 placeholder={'请输入账号'}
                 rules={[
@@ -140,52 +160,11 @@ const Register: React.FC = () => {
                   },
                 ]}
               />
-              <ProFormText
-                name="userEmail"
-                fieldProps={{
-                  size: 'large',
-                  prefix: <SafetyOutlined />,
-                  onChange: (e) => {
-                    setEmail(e.target.value);
-                  },
-                }}
-                placeholder={'请输入邮箱'}
-                rules={[
-                  {
-                    required: true,
-                    message: '邮箱是必填项！',
-                  },
-                ]}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ProFormText
-                  name="code"
-                  fieldProps={{
-                    size: 'large',
-                    prefix: <SafetyOutlined />,
-                  }}
-                  placeholder={'请输入验证码'}
-                  rules={[
-                    {
-                      required: true,
-                      message: '验证码是必填项！',
-                    },
-                  ]}
-                />
-                <Button
-                  type="primary"
-                  style={{ marginLeft: '10px', marginTop: '5px' }}
-                  onClick={isSending ? () => {} : handleSendCode}
-                >
-                  {buttonText}
-                </Button>
-              </div>
-
               <ProFormText.Password
                 name="userPassword"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined />,
+                  prefix: <LockOutlined/>,
                 }}
                 placeholder={'请输入密码'}
                 rules={[
@@ -199,9 +178,9 @@ const Register: React.FC = () => {
                 name="checkPassword"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined />,
+                  prefix: <LockOutlined/>,
                 }}
-                placeholder={'请再次确认密码'}
+                placeholder={'请确认密码'}
                 rules={[
                   {
                     required: true,
@@ -209,20 +188,124 @@ const Register: React.FC = () => {
                   },
                 ]}
               />
+              <ProFormText
+                name="invitationCode"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LinkOutlined/>,
+                }}
+                placeholder={'请输入邀请码,没有可不填'}
+              />
             </>
           )}
-
+          {type === 'email' && (
+            <>
+              <ProFormText
+                name="userName"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined />,
+                }}
+                placeholder={'请输入昵称'}
+              />
+              <ProFormText
+                fieldProps={{
+                  size: 'large',
+                  prefix: <MailOutlined/>,
+                }}
+                name="emailAccount"
+                placeholder={'请输入邮箱账号！'}
+                rules={[
+                  {
+                    required: true,
+                    message: '邮箱账号是必填项！',
+                  },
+                  {
+                    pattern: /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/,
+                    message: '不合法的邮箱账号！',
+                  },
+                ]}
+              />
+              <ProFormText
+                name="invitationCode"
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LinkOutlined/>,
+                }}
+                placeholder={'请输入邀请码,没有可不填'}
+              />
+              <ProFormCaptcha
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined/>,
+                }}
+                captchaProps={{
+                  size: 'large',
+                }}
+                placeholder={'请输入验证码！'}
+                captchaTextRender={(timing, count) => {
+                  if (timing) {
+                    return `${count} ${'秒后重新获取'}`;
+                  }
+                  return '获取验证码';
+                }}
+                phoneName={"emailAccount"}
+                name="captcha"
+                rules={[
+                  {
+                    required: true,
+                    message: '验证码是必填项！',
+                  },
+                ]}
+                onGetCaptcha={async (emailAccount) => {
+                  const res = await getCaptchaUsingGET({emailAccount})
+                  if (res.data && res.code === 0) {
+                    message.success("验证码发送成功")
+                    return
+                  }
+                }}
+              />
+            </>
+          )}
+          <ProFormCheckbox
+            initialValue={true}
+            name="agreeToAnAgreement"
+            rules={[
+              () => ({
+                validator(_, value) {
+                  if (!value) {
+                    return Promise.reject(new Error("同意协议后才可以注册"));
+                  }
+                  return Promise.resolve();
+                },
+                required: true,
+              })]}
+          >
+            同意并接受《<a
+            target={"_blank"}
+            href={"https://gitee.com/qimu6/statement/blob/master/%E9%9A%90%E7%A7%81%E5%8D%8F%E8%AE%AE.md#%E6%9F%92%E6%9C%A8%E6%8E%A5%E5%8F%A3-%E9%9A%90%E7%A7%81%E6%9D%A1%E6%AC%BE"}
+            rel="noreferrer">隐私协议</a>》《<a
+            target={"_blank"}
+            href={"https://gitee.com/qimu6/statement/blob/master/%E6%9F%92%E6%9C%A8%E6%8E%A5%E5%8F%A3%E7%94%A8%E6%88%B7%E5%8D%8F%E8%AE%AE.md#%E6%9F%92%E6%9C%A8%E6%8E%A5%E5%8F%A3%E7%94%A8%E6%88%B7%E5%8D%8F%E8%AE%AE"}
+            rel="noreferrer">用户协议</a>》
+          </ProFormCheckbox>
           <div
             style={{
-              marginBottom: 24,
-              textAlign: 'right',
+              marginTop: -18,
             }}
           >
-            <Link to="/user/login">老用户登录</Link>
+            <Link
+              to={'/user/login'}
+              style={{
+                float: 'right',
+              }}
+            >
+              已有账号?点击前往登录
+            </Link>
           </div>
         </LoginForm>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 };

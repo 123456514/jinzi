@@ -1,4 +1,4 @@
-import { uploadFileUsingPost } from '@/services/backend/fileController';
+import {uploadFileUsingPost, uploadTwoFileUsingPost} from '@/services/backend/fileController';
 import { InboxOutlined } from '@ant-design/icons';
 import { message, UploadFile, UploadProps } from 'antd';
 import Dragger from 'antd/es/upload/Dragger';
@@ -32,7 +32,7 @@ const FileUploader: React.FC<Props> = (props) => {
     customRequest: async (fileObj: any) => {
       setLoading(true);
       try {
-        const res = await uploadFileUsingPost(
+        const res = await uploadTwoFileUsingPost(
           {
             biz,
           },

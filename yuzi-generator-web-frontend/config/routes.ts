@@ -53,9 +53,24 @@ export default [
     access: 'canAdmin',
     routes: [
       { path: '/admin', redirect: '/admin/user' },
-      { icon: 'table', path: '/admin/user', component: './Admin/User', name: "用户管理" },
       { icon: 'tools', path: '/admin/generator', component: './Admin/Generator', name: "生成器管理" },
+      { name: '商品管理', icon: 'table', path: '/admin/productInfo/list', component: './Admin/ProductInfoList',},
+      { name: '用户管理', icon: 'TeamOutlined', path: '/admin/user/list', component: './Admin/UserList',},
     ],
+  },
+  {
+    path: '/order/pay/:id',
+    icon: 'PayCircleOutlined',
+    name: '订单支付',
+    component: './Order/PayOrder',
+    hideInMenu: true,
+  },
+  {
+    path: '/order/info/:id',
+    icon: 'ProfileOutlined',
+    name: '订单详情',
+    component: './Order/OrderInfo',
+    hideInMenu: true,
   },
   {
     path: '/account/center',

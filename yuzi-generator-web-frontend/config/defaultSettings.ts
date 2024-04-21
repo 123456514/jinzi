@@ -10,12 +10,13 @@ const Settings: ProLayoutProps & {
   navTheme: 'light',
   colorPrimary: '#2F54EB',
   layout: 'top',
-  contentWidth: 'Fixed',
-  fixedHeader: false,
+  contentWidth: 'Fluid',
+  fixedHeader: true,
   fixSiderbar: true,
   colorWeak: false,
+  splitMenus: false,
   title: '金子代码生成',
-  pwa: true,
+  pwa: false,
   iconfontUrl: '',
   token: {
     // 参见ts声明，demo 见文档，通过token 修改样式

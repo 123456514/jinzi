@@ -35,7 +35,7 @@ const GeneratorAddPage: React.FC = () => {
   // 记录表单已填数据
   const [basicInfo, setBasicInfo] = useState<API.GeneratorEditRequest>();
   const [modelConfig, setModelConfig] = useState<API.ModelConfig>();
-  const [fileConfig, setFileConfig] = useState<API.FileConfig>();
+  const [fileConfig, setFileConfig] = useState<API.FileConfigDTO>();
 
   /**
    * 加载数据

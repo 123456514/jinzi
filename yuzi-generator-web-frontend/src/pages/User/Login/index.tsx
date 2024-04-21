@@ -1,17 +1,18 @@
 import Footer from '@/components/Footer';
-import { userLoginUsingPost } from '@/services/backend/userController';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { LoginForm, ProFormText } from '@ant-design/pro-components';
-import { useEmotionCss } from '@ant-design/use-emotion-css';
-import { Helmet, history, useModel } from '@umijs/max';
-import { message, Tabs } from 'antd';
-import React, { useState } from 'react';
-import { Link } from 'umi';
+import {getCaptchaUsingGET, userEmailLoginUsingPOST, userLoginUsingPost} from '@/services/backend/userController';
+import {LockOutlined, MailOutlined, UserOutlined} from '@ant-design/icons';
+import {LoginForm, ProFormText} from '@ant-design/pro-components';
+import {useEmotionCss} from '@ant-design/use-emotion-css';
+import {Helmet, history, useModel} from '@umijs/max';
+import {message, Tabs} from 'antd';
+import React, {useState} from 'react';
+import {Link} from 'umi';
 import Settings from '../../../../config/defaultSettings';
+import {ProFormCaptcha} from "@ant-design/pro-form";
 
 const Login: React.FC = () => {
   const [type, setType] = useState<string>('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const {initialState, setInitialState} = useModel('@@initialState');
   const containerClassName = useEmotionCss(() => {
     return {
       display: 'flex',
@@ -23,26 +24,39 @@ const Login: React.FC = () => {
       backgroundSize: '100% 100%',
     };
   });
-
+  const doLogin = (res: any) => {
+    if (res.data && res.code === 0) {
+      message.success('登陆成功');
+      setTimeout(() => {
+        const urlParams = new URL(window.location.href).searchParams;
+        history.push(urlParams.get('redirect') || '/');
+      }, 100);
+      setInitialState({loginUser: res.data, settings: Settings});
+    }
+  }
   const handleSubmit = async (values: API.UserLoginRequest) => {
     try {
       // 登录
       const res = await userLoginUsingPost({
         ...values,
       });
+      doLogin(res)
+    } catch (error) {
+      const defaultLoginFailureMessage = '登录失败，请重试！';
+      message.error(defaultLoginFailureMessage);
+    }
+  };
 
-      const defaultLoginSuccessMessage = '登录成功！';
-      message.success(defaultLoginSuccessMessage);
-      // 保存已登录用户信息
-      setInitialState({
-        ...initialState,
-        currentUser: res.data,
+
+  const handleEmailSubmit = async (values: API.UserEmailLoginRequest) => {
+    try {
+      // 登录
+      const res = await userEmailLoginUsingPOST({
+        ...values,
       });
-      const urlParams = new URL(window.location.href).searchParams;
-      history.push(urlParams.get('redirect') || '/');
-      return;
-    } catch (error: any) {
-      const defaultLoginFailureMessage = `登录失败，${error.message}`;
+      doLogin(res)
+    } catch (error) {
+      const defaultLoginFailureMessage = '登录失败，请重试！';
       message.error(defaultLoginFailureMessage);
     }
   };
@@ -65,14 +79,18 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" style={{ height: '100%' }} src="/logo.png" />}
+          logo={<img alt="logo" style={{height: '100%'}} src="/logo.png"/>}
           title="金子代码生成"
           subTitle={'代码生成器在线制作共享，大幅提升开发效率'}
           initialValues={{
             autoLogin: true,
           }}
           onFinish={async (values) => {
-            await handleSubmit(values as API.UserLoginRequest);
+            if (type === "account") {
+              await handleSubmit(values as API.UserLoginRequest);
+            } else {
+              await handleEmailSubmit(values as API.UserEmailLoginRequest);
+            }
           }}
         >
           <Tabs
@@ -80,6 +98,10 @@ const Login: React.FC = () => {
             onChange={setType}
             centered
             items={[
+              {
+                key: 'email',
+                label: '邮箱账号登录',
+              },
               {
                 key: 'account',
                 label: '账户密码登录',
@@ -92,7 +114,7 @@ const Login: React.FC = () => {
                 name="userAccount"
                 fieldProps={{
                   size: 'large',
-                  prefix: <UserOutlined />,
+                  prefix: <UserOutlined/>,
                 }}
                 placeholder={'请输入账号'}
                 rules={[
@@ -106,7 +128,7 @@ const Login: React.FC = () => {
                 name="userPassword"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined />,
+                  prefix: <LockOutlined/>,
                 }}
                 placeholder={'请输入密码'}
                 rules={[
@@ -115,6 +137,59 @@ const Login: React.FC = () => {
                     message: '密码是必填项！',
                   },
                 ]}
+              />
+            </>
+          )}
+          {type === 'email' && (
+            <>
+              <ProFormText
+                fieldProps={{
+                  size: 'large',
+                  prefix: <MailOutlined/>,
+                }}
+                name="emailAccount"
+                placeholder={'请输入邮箱账号！'}
+                rules={[
+                  {
+                    required: true,
+                    message: '邮箱账号是必填项！',
+                  },
+                  {
+                    pattern: /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/,
+                    message: '不合法的邮箱账号！',
+                  },
+                ]}
+              />
+              <ProFormCaptcha
+                fieldProps={{
+                  size: 'large',
+                  prefix: <LockOutlined/>,
+                }}
+                captchaProps={{
+                  size: 'large',
+                }}
+                placeholder={'请输入验证码！'}
+                captchaTextRender={(timing, count) => {
+                  if (timing) {
+                    return `${count} ${'秒后重新获取'}`;
+                  }
+                  return '获取验证码';
+                }}
+                phoneName={"emailAccount"}
+                name="captcha"
+                rules={[
+                  {
+                    required: true,
+                    message: '验证码是必填项！',
+                  },
+                ]}
+                onGetCaptcha={async (emailAccount) => {
+                  const res = await getCaptchaUsingGET({emailAccount})
+                  if (res.data && res.code === 0) {
+                    message.success("验证码发送成功")
+                    return
+                  }
+                }}
               />
             </>
           )}
@@ -129,7 +204,7 @@ const Login: React.FC = () => {
           </div>
         </LoginForm>
       </div>
-      <Footer />
+      <Footer/>
     </div>
   );
 };

@@ -34,7 +34,7 @@ const GeneratorUsePage: React.FC = () => {
   const [downloading, setDownloading] = useState<boolean>(false);
   const [data, setData] = useState<API.GeneratorVO>({});
   const { initialState } = useModel('@@initialState');
-  const { currentUser } = initialState ?? {};
+  const { loginUser } = initialState ?? {};
 
   const models = data?.modelConfig?.models ?? [];
 
@@ -82,7 +82,7 @@ const GeneratorUsePage: React.FC = () => {
   /**
    * 下载按钮
    */
-  const downloadButton = data.distPath && currentUser && (
+  const downloadButton = data.distPath && loginUser && (
     <Button
       type="primary"
       icon={<DownloadOutlined />}
