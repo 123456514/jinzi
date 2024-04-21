@@ -10,6 +10,7 @@ import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.model.dto.pay.PayCreateRequest;
 import com.jinzi.web.model.entity.ProductInfo;
 import com.jinzi.web.model.entity.ProductOrder;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.PaymentStatusEnum;
 import com.jinzi.web.model.productorder.ProductOrderQueryRequest;
 import com.jinzi.web.model.vo.OrderVo;
@@ -82,7 +83,7 @@ public class OrderController {
         if (StringUtils.isBlank(id)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         // 校验数据是否存在
         ProductOrder productOrder = productOrderService.getById(id);
         if (productOrder == null) {
@@ -142,7 +143,7 @@ public class OrderController {
         if (size > 50) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         Long userId = loginUser.getId();
         QueryWrapper<ProductOrder> queryWrapper = new QueryWrapper<>();
 
@@ -182,7 +183,7 @@ public class OrderController {
         if (StringUtils.isBlank(payType)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "暂无该支付方式");
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         ProductOrderVo productOrderVo = orderService.createOrderByPayType(productId, payType, loginUser);
         if (productOrderVo == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "订单创建失败，请稍后再试");

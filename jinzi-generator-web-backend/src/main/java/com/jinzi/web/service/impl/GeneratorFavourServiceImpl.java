@@ -27,8 +27,7 @@ import javax.annotation.Resource;
  * @author zhoujin
  */
 @Service
-public class GeneratorFavourServiceImpl extends ServiceImpl<GeneratorFavourMapper, GeneratorFavour>
-        implements GeneratorFavourService {
+public class GeneratorFavourServiceImpl extends ServiceImpl<GeneratorFavourMapper, GeneratorFavour> implements GeneratorFavourService {
 
     @Resource
     private GeneratorService generatorService;
@@ -41,7 +40,7 @@ public class GeneratorFavourServiceImpl extends ServiceImpl<GeneratorFavourMappe
      * @return
      */
     @Override
-    public int doGeneratorFavour(long generatorId, UserVO loginUser) {
+    public int doGeneratorFavour(long generatorId, User loginUser) {
         // 判断是否存在
         Generator generator = generatorService.getById(generatorId);
         if (generator == null) {

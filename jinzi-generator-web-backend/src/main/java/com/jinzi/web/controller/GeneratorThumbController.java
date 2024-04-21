@@ -49,7 +49,7 @@ public class GeneratorThumbController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能点赞
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         long generatorId = generatorThumbAddRequest.getGeneratorId();
         int result = generatorThumbService.doGeneratorThumb(generatorId, loginUser);
         return ResultUtils.success(result);

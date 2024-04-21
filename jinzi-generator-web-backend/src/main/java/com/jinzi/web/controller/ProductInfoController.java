@@ -11,6 +11,7 @@ import com.jinzi.web.model.dto.productinfo.ProductInfoQueryRequest;
 import com.jinzi.web.model.dto.productinfo.ProductInfoSearchTextRequest;
 import com.jinzi.web.model.dto.productinfo.ProductInfoUpdateRequest;
 import com.jinzi.web.model.entity.ProductInfo;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.ProductInfoStatusEnum;
 import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.ProductInfoService;
@@ -65,7 +66,7 @@ public class ProductInfoController {
         BeanUtils.copyProperties(productInfoAddRequest, productInfo);
         // 校验
         productInfoService.validProductInfo(productInfo, true);
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         productInfo.setUserId(loginUser.getId());
         boolean result = productInfoService.save(productInfo);
         if (!result) {
@@ -88,7 +89,7 @@ public class ProductInfoController {
         if (ObjectUtils.anyNull(deleteRequest, deleteRequest.getId()) || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO user = userService.getLoginUser(request);
+        User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
         ProductInfo oldProductInfo = productInfoService.getById(id);
@@ -123,7 +124,7 @@ public class ProductInfoController {
         BeanUtils.copyProperties(productInfoUpdateRequest, productInfo);
         // 参数校验
         productInfoService.validProductInfo(productInfo, false);
-        UserVO user = userService.getLoginUser(request);
+        User user = userService.getLoginUser(request);
         long id = productInfoUpdateRequest.getId();
         // 判断是否存在
         ProductInfo oldProductInfo = productInfoService.getById(id);

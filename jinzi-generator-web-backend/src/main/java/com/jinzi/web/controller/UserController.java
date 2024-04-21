@@ -1,16 +1,16 @@
 package com.jinzi.web.controller;
 
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.jinzi.web.annotation.AuthCheck;
 import com.jinzi.web.common.BaseResponse;
 import com.jinzi.web.common.DeleteRequest;
 import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.common.ResultUtils;
 import com.jinzi.web.config.EmailConfig;
-import com.jinzi.web.constant.EmailConstant;
-import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
 import com.jinzi.web.model.dto.user.*;
@@ -18,12 +18,10 @@ import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.LoginUserVO;
 import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.UserService;
-import com.jinzi.web.utils.EmailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -38,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.jinzi.web.constant.EmailConstant.*;
 import static com.jinzi.web.constant.UserConstant.ADMIN_ROLE;
@@ -62,8 +61,6 @@ public class UserController {
     private RedisTemplate<String, String> redisTemplate;
 
 
-    // region 登录相关
-
     /**
      * 用户注册
      *
@@ -78,6 +75,7 @@ public class UserController {
         long result = userService.userRegister(userRegisterRequest);
         return ResultUtils.success(result);
     }
+
     /**
      * 用户电子邮件注册
      *
@@ -93,6 +91,7 @@ public class UserController {
         redisTemplate.delete(CAPTCHA_CACHE_KEY + userEmailRegisterRequest.getEmailAccount());
         return ResultUtils.success(result);
     }
+
     /**
      * 获取验证码
      *
@@ -212,26 +211,22 @@ public class UserController {
      */
     @GetMapping("/get/login")
     public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
-        UserVO user = userService.getLoginUser(request);
+        User user = userService.getLoginUser(request);
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
         return ResultUtils.success(userVO);
     }
 
-    // endregion
-
-    // region 增删改查
 
     /**
      * 创建用户
      *
      * @param userAddRequest
-     * @param request
      * @return
      */
     @PostMapping("/add")
     @AuthCheck(mustRole = ADMIN_ROLE)
-    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
+    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
         if (userAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -250,12 +245,11 @@ public class UserController {
      * 删除用户
      *
      * @param deleteRequest
-     * @param request
      * @return
      */
     @PostMapping("/delete")
     @AuthCheck(mustRole = ADMIN_ROLE)
-    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
+    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -273,14 +267,6 @@ public class UserController {
     @PostMapping("/update")
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<UserVO> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-//        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
-//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-//        }
-//        User user = new User();
-//        BeanUtils.copyProperties(userUpdateRequest, user);
-//        boolean result = userService.updateById(user);
-//        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
-//        return ResultUtils.success(true);
         if (ObjectUtils.anyNull(userUpdateRequest, userUpdateRequest.getId()) || userUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -290,7 +276,7 @@ public class UserController {
                 || StringUtils.isNoneBlank(userUpdateRequest.getUserRole())
                 || StringUtils.isNoneBlank(userUpdateRequest.getUserPassword());
         // 校验是否登录
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         // 处理管理员业务,不是管理员抛异常
         if (adminOperation && !loginUser.getUserRole().equals(ADMIN_ROLE)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
@@ -321,12 +307,11 @@ public class UserController {
      * 根据 id 获取用户（仅管理员）
      *
      * @param id
-     * @param request
      * @return
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = ADMIN_ROLE)
-    public BaseResponse<User> getUserById(long id, HttpServletRequest request) {
+    public BaseResponse<User> getUserById(long id) {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -339,12 +324,11 @@ public class UserController {
      * 根据 id 获取包装类
      *
      * @param id
-     * @param request
      * @return
      */
     @GetMapping("/get/vo")
-    public BaseResponse<UserVO> getUserVOById(long id, HttpServletRequest request) {
-        BaseResponse<User> response = getUserById(id, request);
+    public BaseResponse<UserVO> getUserVOById(long id) {
+        BaseResponse<User> response = getUserById(id);
         User user = response.getData();
         return ResultUtils.success(userService.getUserVO(user));
     }
@@ -353,18 +337,39 @@ public class UserController {
      * 分页获取用户列表（仅管理员）
      *
      * @param userQueryRequest
-     * @param request
      * @return
      */
-    @PostMapping("/list/page")
+    @GetMapping("/list/page")
     @AuthCheck(mustRole = ADMIN_ROLE)
-    public BaseResponse<Page<User>> listUserByPage(@RequestBody UserQueryRequest userQueryRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest) {
+        User userQuery = new User();
+        if (userQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        BeanUtils.copyProperties(userQueryRequest, userQuery);
+
+        String userName = userQueryRequest.getUserName();
+        String userAccount = userQueryRequest.getUserAccount();
+        String gender = userQueryRequest.getGender();
+        String userRole = userQueryRequest.getUserRole();
         long current = userQueryRequest.getCurrent();
-        long size = userQueryRequest.getPageSize();
-        Page<User> userPage = userService.page(new Page<>(current, size),
-                userService.getQueryWrapper(userQueryRequest));
-        return ResultUtils.success(userPage);
+        long pageSize = userQueryRequest.getPageSize();
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName)
+                .eq(StringUtils.isNotBlank(userAccount), "userAccount", userAccount)
+                .eq(StringUtils.isNotBlank(gender), "gender", gender)
+                .eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
+        Page<User> userPage = userService.page(new Page<>(current, pageSize), queryWrapper);
+        Page<UserVO> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
+            UserVO userVO = new UserVO();
+            BeanUtils.copyProperties(user, userVO);
+            return userVO;
+        }).collect(Collectors.toList());
+        userVoPage.setRecords(userVOList);
+        return ResultUtils.success(userVoPage);
     }
 
     /**
@@ -375,8 +380,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/list/page/vo")
-    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest, HttpServletRequest request) {
         if (userQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -392,7 +396,7 @@ public class UserController {
         return ResultUtils.success(userVOPage);
     }
 
-    // endregion
+
 
     /**
      * 更新个人信息
@@ -402,12 +406,11 @@ public class UserController {
      * @return
      */
     @PostMapping("/update/my")
-    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest, HttpServletRequest request) {
         if (userUpdateMyRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         User user = new User();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
         user.setId(loginUser.getId());
@@ -415,6 +418,13 @@ public class UserController {
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
+
+    /**
+     * 发送邮件
+     * @param emailAccount
+     * @param captcha
+     * @throws MessagingException
+     */
     private void sendEmail(String emailAccount, String captcha) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         // 邮箱发送内容组成

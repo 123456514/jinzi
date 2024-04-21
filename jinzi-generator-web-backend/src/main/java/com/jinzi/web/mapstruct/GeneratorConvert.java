@@ -17,7 +17,7 @@ public interface GeneratorConvert {
 
     GeneratorConvert INSTANCE = Mappers.getMapper(GeneratorConvert.class);
 
-    Generator convertGeneratorByAddRequest(GeneratorAddRequest generatorAddRequest);
+//    Generator convertGeneratorByAddRequest(GeneratorAddRequest generatorAddRequest);
 
     Generator convertGeneratorByUpdateRequest(GeneratorUpdateRequest generatorUpdateRequest);
 

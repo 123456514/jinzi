@@ -1,6 +1,7 @@
 package com.jinzi.web.model.vo;
 
 import com.jinzi.web.meta.Meta;
+import com.jinzi.web.model.entity.dishPathInfo;
 import lombok.Data;
 
 import java.io.Serializable;

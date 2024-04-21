@@ -20,7 +20,7 @@ public interface GeneratorThumbService extends IService<GeneratorThumb> {
      * @param loginUser
      * @return
      */
-    int doGeneratorThumb(long generatorId, UserVO loginUser);
+    int doGeneratorThumb(long generatorId, User loginUser);
 
     /**
      * 生成器点赞（内部服务）

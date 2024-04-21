@@ -23,7 +23,7 @@ public interface GeneratorFavourService extends IService<GeneratorFavour> {
      * @param loginUser
      * @return
      */
-    int doGeneratorFavour(long postId, UserVO loginUser);
+    int doGeneratorFavour(long postId, User loginUser);
 
     /**
      * 分页获取用户收藏的代码生成器列表

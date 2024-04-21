@@ -7,6 +7,7 @@ import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.common.ResultUtils;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.model.entity.DailyCheckIn;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.DailyCheckInService;
 import com.jinzi.web.service.UserService;
@@ -48,7 +49,7 @@ public class DailyCheckInController {
     @Transactional(rollbackFor = Exception.class)
     public BaseResponse<Boolean> doDailyCheckIn(HttpServletRequest request) {
         // 判断用户是否登录
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         // 制作一个分布式锁
         String redissonLock = ("doDailyCheckIn_" + loginUser.getUserAccount()).intern();
         return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {

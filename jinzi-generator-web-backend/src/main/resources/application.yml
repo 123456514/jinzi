@@ -64,3 +64,32 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.jinzi.web.controller
+cos:
+  client:
+    accessKey: "AKIDBSoO4qhbZYaeDt1LkCgGubzNmChAe8fB"
+    secretKey: "cBoOvQwfM0eRBHQYgmw8Tm8Sl1QwTyY7"
+    region: "ap-chengdu"
+    bucket: "jinzi-generator-1310252632"
+# 微信支付配置
+wx:
+  pay:
+    appId: wxxxxxxxxx67e8dc
+    mchId: 1x0xxxx68
+    apiV3Key: xxxxxbxxx3xxxx3xxx4
+    privateKeyPath: classpath:/pem/apiclient_key.pem
+    privateCertPath: classpath:/pem/apiclient_cert.pem
+    # 本地测试用ngrok内网穿透，这个内网穿透地址，可以修改为自己的。上线修改为后端的接口地址即可
+    notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
+
+# 支付宝支付配置
+alipay:
+  appId: 9021000136636139
+  sellerId: 2xxxxxxxxxxxxx7
+  # 本地测试用ngrok内网穿透，这个内网穿透地址，可以修改为自己的。上线修改为后端的接口地址即可
+  notifyUrl: https://beloved-massive-sheepdog.ngrok-free.app/api/order/notify/order
+  #  支付成功之后跳转到的页面
+  returnUrl: http://localhost:8000/account/center
+  # 私钥
+  private-key: xxxxxxxxxx
+  # 公钥
+  ali-pay-public-key: xxxxxxxxxxxxxxxx

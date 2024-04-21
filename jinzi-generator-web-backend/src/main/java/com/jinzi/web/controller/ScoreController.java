@@ -2,6 +2,7 @@ package com.jinzi.web.controller;
 
 import com.jinzi.web.common.BaseResponse;
 import com.jinzi.web.common.ResultUtils;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.ScoreService;
 import com.jinzi.web.service.UserService;
@@ -31,7 +32,7 @@ public class ScoreController {
      */
     @PostMapping("/checkIn")
     public BaseResponse<String> checkIn(HttpServletRequest request) {
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         scoreService.checkIn(loginUser.getId());
         return ResultUtils.success("签到成功");
     }
@@ -44,7 +45,7 @@ public class ScoreController {
      */
     @GetMapping("/get")
     public BaseResponse<Long> getUserById(HttpServletRequest request) {
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         Long totalPoints = scoreService.getUserPoints(loginUser.getId());
         return ResultUtils.success(totalPoints);
     }
@@ -57,7 +58,7 @@ public class ScoreController {
      */
     @GetMapping("/getSign")
     public BaseResponse<Integer> getSignById(HttpServletRequest request) {
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         int isSign = scoreService.getIsSign(loginUser.getId());
         return ResultUtils.success(isSign);
     }

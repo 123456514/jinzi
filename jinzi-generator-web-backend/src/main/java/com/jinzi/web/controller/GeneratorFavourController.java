@@ -59,7 +59,7 @@ public class GeneratorFavourController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能操作
-        final UserVO loginUser = userService.getLoginUser(request);
+        final User loginUser = userService.getLoginUser(request);
         long generatorId = generatorFavourAddRequest.getGeneratorId();
         int result = generatorFavourService.doGeneratorFavour(generatorId, loginUser);
         return ResultUtils.success(result);
@@ -77,7 +77,7 @@ public class GeneratorFavourController {
         if (generatorQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫

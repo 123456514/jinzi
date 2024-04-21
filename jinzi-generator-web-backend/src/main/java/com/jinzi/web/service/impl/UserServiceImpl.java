@@ -1,7 +1,6 @@
 package com.jinzi.web.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -31,7 +30,6 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -322,7 +320,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码输入有误");
         }
         // 查询用户是否绑定该邮箱
-        UserVO loginUser = this.getLoginUser(request);
+        User loginUser = this.getLoginUser(request);
         if (loginUser.getEmail() != null && emailAccount.equals(loginUser.getEmail())) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "该账号已绑定此邮箱,请更换新的邮箱！");
         }
@@ -341,7 +339,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "邮箱绑定失败,请稍后再试！");
         }
         loginUser.setEmail(emailAccount);
-        return loginUser;
+        UserVO retUser = new UserVO();
+        BeanUtils.copyProperties(retUser,loginUser);
+        return retUser;
     }
 
     /**
@@ -371,7 +371,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码输入有误");
         }
         // 查询用户是否绑定该邮箱
-        UserVO loginUser = this.getLoginUser(request);
+        User loginUser = this.getLoginUser(request);
         if (loginUser.getEmail() == null) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "该账号未绑定邮箱");
         }
@@ -386,7 +386,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "邮箱解绑失败,请稍后再试！");
         }
         loginUser.setEmail(null);
-        return loginUser;
+        UserVO retUser = new UserVO();
+        BeanUtils.copyProperties(retUser,loginUser);
+        return retUser;
     }
     /**
      * 获取当前登录用户
@@ -395,7 +397,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public UserVO getLoginUser(HttpServletRequest request) {
+    public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User currentUser = (User) userObj;
@@ -404,16 +406,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 从数据库查询（追求性能的话可以注释，直接走缓存）
         long userId = currentUser.getId();
-        User user = this.getById(userId);
-        if (user == null) {
+        currentUser = this.getById(userId);
+        if (currentUser == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
-        if (user.getStatus().equals(UserAccountStatusEnum.BAN.getValue())) {
-            throw new BusinessException(ErrorCode.PROHIBITED, "账号已封禁");
-        }
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return userVO;
+        return currentUser;
     }
 
     /**
@@ -446,15 +443,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
         User user = (User) userObj;
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userVO,user);
-        return isAdmin(userVO);
+        return isAdmin(user);
     }
 
     @Override
-    public boolean isAdmin(UserVO user) {
+    public boolean isAdmin(User user) {
         return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
+
 
     /**
      * 用户注销
@@ -512,14 +508,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         Long id = userQueryRequest.getId();
         String userName = userQueryRequest.getUserName();
-//        String userProfile = userQueryRequest.getUserProfile();
         String userRole = userQueryRequest.getUserRole();
         String sortField = userQueryRequest.getSortField();
         String sortOrder = userQueryRequest.getSortOrder();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
-//        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
@@ -603,5 +597,4 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
     }
-
 }

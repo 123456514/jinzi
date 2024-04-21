@@ -164,7 +164,7 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         User loginUser = userService.getLoginUserPermitNull(request);
         if (loginUser != null) {
             Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
-            UserVO login  = userService.getLoginUser(request);
+            User login  = userService.getLoginUser(request);
             // 获取点赞
             QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
             generatorThumbQueryWrapper.in("generatorId", generatorIdSet);

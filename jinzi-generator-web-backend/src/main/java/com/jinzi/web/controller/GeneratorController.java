@@ -16,12 +16,14 @@ import com.jinzi.web.common.ResultUtils;
 import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
+import com.jinzi.web.manager.CacheManager;
 import com.jinzi.web.manager.CosManager;
 import com.jinzi.web.mapstruct.GeneratorConvert;
 import com.jinzi.web.model.dto.generator.*;
 import com.jinzi.web.model.entity.Generator;
+import com.jinzi.web.model.entity.User;
+import com.jinzi.web.model.entity.dishPathInfo;
 import com.jinzi.web.model.vo.GeneratorVO;
-import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.UserService;
 import com.qcloud.cos.model.COSObject;
@@ -39,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +65,8 @@ public class GeneratorController {
 
     @Resource
     private CosManager cosManager;
+    @Resource
+    private CacheManager cacheManager;
 
     // region 增删改查
 
@@ -77,9 +82,35 @@ public class GeneratorController {
         if (generatorAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByAddRequest(generatorAddRequest);
+        String name = generatorAddRequest.getName();
+        String description = generatorAddRequest.getDescription();
+        String basePackage = generatorAddRequest.getBasePackage();
+        String version = generatorAddRequest.getVersion();
+        String author = generatorAddRequest.getAuthor();
+        List<String> tags = generatorAddRequest.getTags();
+        String picture = generatorAddRequest.getPicture();
+        com.jinzi.web.meta.Meta.FileConfigDTO fileConfigDTO = generatorAddRequest.getFileConfigDTO();
+        com.jinzi.web.meta.Meta.ModelConfig modelConfig = generatorAddRequest.getModelConfig();
+        dishPathInfo distPath = generatorAddRequest.getDistPath();
+        Integer status = generatorAddRequest.getStatus();
+
+//        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByAddRequest(generatorAddRequest);
+        Generator generator = new Generator();
+        generator.setName(name);
+        generator.setDescription(description);
+        generator.setBasePackage(basePackage);
+        generator.setVersion(version);
+        generator.setAuthor(author);
+        generator.setTags(tags);
+        generator.setPicture(picture);
+        generator.setFileConfig(fileConfigDTO);
+        generator.setModelConfig(modelConfig);
+        generator.setDistPath(distPath.getUrl());
+        generator.setStatus(status);
+
+
         generatorService.validGenerator(generator, true);
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         generator.setUserId(loginUser.getId());
         generator.setFavourNum(0);
         generator.setThumbNum(0);
@@ -101,7 +132,7 @@ public class GeneratorController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO user = userService.getLoginUser(request);
+        User user = userService.getLoginUser(request);
         long id = deleteRequest.getId();
         // 判断是否存在
         Generator oldGenerator = generatorService.getById(id);
@@ -203,7 +234,7 @@ public class GeneratorController {
         if (generatorQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         generatorQueryRequest.setUserId(loginUser.getId());
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
@@ -231,7 +262,7 @@ public class GeneratorController {
         Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByEditRequest(generatorEditRequest);
         // 参数校验
         generatorService.validGenerator(generator, false);
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         long id = generatorEditRequest.getId();
         // 判断是否存在
         Generator oldGenerator = generatorService.getById(id);
@@ -244,6 +275,7 @@ public class GeneratorController {
         return ResultUtils.success(result);
     }
 
+
     /**
      * 根据 id 下载
      *
@@ -254,7 +286,7 @@ public class GeneratorController {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
@@ -317,7 +349,7 @@ public class GeneratorController {
     public void useGenerator(@RequestBody GeneratorUseRequest generatorUseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         // 1. 获取请求参数
         ThrowUtils.throwIf(generatorUseRequest == null, ErrorCode.PARAMS_ERROR);
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         ThrowUtils.throwIf(ObjectUtil.isEmpty(loginUser), ErrorCode.PARAMS_ERROR);
         Long id = generatorUseRequest.getId();
         Map<String, Object> dataModel = generatorUseRequest.getDataModel();
@@ -436,7 +468,7 @@ public class GeneratorController {
         Meta meta = generatorMakeRequest.getMeta();
 
         // 需要登录
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
 
         // 2）创建独立工作空间，下载压缩包到本地
         if (StrUtil.isBlank(zipFilePath)) {

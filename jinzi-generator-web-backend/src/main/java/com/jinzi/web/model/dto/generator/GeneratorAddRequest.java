@@ -1,6 +1,7 @@
 package com.jinzi.web.model.dto.generator;
 
 import com.jinzi.web.meta.Meta;
+import com.jinzi.web.model.entity.dishPathInfo;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -60,7 +61,7 @@ public class GeneratorAddRequest implements Serializable {
     /**
      * 代码生成器产物路径
      */
-    private String distPath;
+    private  dishPathInfo distPath;
 
     /**
      * 状态

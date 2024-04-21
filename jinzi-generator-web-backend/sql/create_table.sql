@@ -42,7 +42,7 @@ create table if not exists generator
     picture                 varchar(256)                       null comment '图片',
     fileConfig              json                               null comment '文件配置（json字符串）',
     modelConfig             json                               null comment '模型配置（json字符串）',
-    distPath                text                               null comment '代码生成器产物路径',
+    distPath                varchar(256)                               null comment '代码生成器产物路径',
     status                  int      default 0                 not null comment '状态',
     thumbNum                int      default 0                 not null comment '点赞数',
     favourNum               int      default 0                 not null comment '收藏数',

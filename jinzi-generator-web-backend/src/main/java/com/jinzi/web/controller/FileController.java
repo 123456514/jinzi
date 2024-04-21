@@ -10,6 +10,7 @@ import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.manager.CosManager;
 import com.jinzi.web.model.dto.file.UploadFileRequest;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.FileUploadBizEnum;
 import com.jinzi.web.model.enums.ImageStatusEnum;
 import com.jinzi.web.model.vo.ImageVo;
@@ -67,7 +68,7 @@ public class FileController {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         validFile(multipartFile, fileUploadBizEnum);
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         // 文件目录：根据业务、用户来划分
         String uuid = RandomStringUtils.randomAlphanumeric(8);
         String filename = uuid + "-" + multipartFile.getOriginalFilename();
@@ -113,7 +114,7 @@ public class FileController {
         if (!"success".equals(result)) {
             return uploadError(imageVo, multipartFile, result);
         }
-        UserVO loginUser = userService.getLoginUser(request);
+        User loginUser = userService.getLoginUser(request);
         // 文件目录：根据业务、用户来划分
         String uuid = RandomStringUtils.randomAlphanumeric(8);
         String filename = uuid + "-" + multipartFile.getOriginalFilename();

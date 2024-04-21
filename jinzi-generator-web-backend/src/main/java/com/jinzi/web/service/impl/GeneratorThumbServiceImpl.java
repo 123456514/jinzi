@@ -38,7 +38,7 @@ public class GeneratorThumbServiceImpl extends ServiceImpl<GeneratorThumbMapper,
      * @return
      */
     @Override
-    public int doGeneratorThumb(long generatorId, UserVO loginUser) {
+    public int doGeneratorThumb(long generatorId, User loginUser) {
         // 判断实体是否存在，根据类别获取实体
         Generator generator = generatorService.getById(generatorId);
         if (generator == null) {

@@ -3,6 +3,7 @@ package com.jinzi.web.service;
 
 
 import com.jinzi.web.model.entity.ProductOrder;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.vo.ProductOrderVo;
 import com.jinzi.web.model.vo.UserVO;
 
@@ -41,7 +42,7 @@ public interface OrderService {
      * @param loginUser 登录用户
      * @return {@link ProductOrderVo}
      */
-    ProductOrderVo createOrderByPayType(Long productId, String payType, UserVO loginUser);
+    ProductOrderVo createOrderByPayType(Long productId, String payType, User loginUser);
 
     /**
      * 按时间获得未支付订单

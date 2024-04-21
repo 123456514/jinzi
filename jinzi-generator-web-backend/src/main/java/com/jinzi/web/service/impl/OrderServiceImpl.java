@@ -6,6 +6,7 @@ import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.model.entity.ProductInfo;
 import com.jinzi.web.model.entity.ProductOrder;
 import com.jinzi.web.model.entity.RechargeActivity;
+import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.PaymentStatusEnum;
 import com.jinzi.web.model.enums.ProductTypeStatusEnum;
 import com.jinzi.web.model.vo.ProductOrderVo;
@@ -16,7 +17,10 @@ import com.jinzi.web.service.RechargeActivityService;
 import com.jinzi.web.utils.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,25 +73,27 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ProductOrderVo createOrderByPayType(Long productId, String payType, UserVO loginUser) {
+    public ProductOrderVo createOrderByPayType(Long productId, String payType, User loginUser) {
         // 按付费类型获取产品订单服务Bean
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userVO,loginUser);
         ProductOrderService productOrderService = getProductOrderServiceByPayType(payType);
-        String redissonLock = ("getOrder_" + loginUser.getUserAccount()).intern();
+        String redissonLock = ("getOrder_" + userVO.getUserAccount()).intern();
 
         ProductOrderVo getProductOrderVo = redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
             // 订单存在就返回不再新创建
-            return productOrderService.getProductOrder(productId, loginUser, payType);
+            return productOrderService.getProductOrder(productId, userVO, payType);
         });
         if (getProductOrderVo != null) {
             return getProductOrderVo;
         }
-        redissonLock = ("createOrder_" + loginUser.getUserAccount()).intern();
+        redissonLock = ("createOrder_" + userVO.getUserAccount()).intern();
         // 分布式锁工具
         return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
             // 检查是否购买充值活动
-            checkBuyRechargeActivity(loginUser.getId(), productId);
+            checkBuyRechargeActivity(userVO.getId(), productId);
             // 保存订单,返回vo信息
-            return productOrderService.saveProductOrder(productId, loginUser);
+            return productOrderService.saveProductOrder(productId, userVO);
         });
     }
 
