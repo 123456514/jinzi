@@ -10,7 +10,6 @@ import com.jinzi.web.constant.UserConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.manager.CosManager;
 import com.jinzi.web.model.dto.file.UploadFileRequest;
-import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.FileUploadBizEnum;
 import com.jinzi.web.model.enums.ImageStatusEnum;
 import com.jinzi.web.model.vo.ImageVo;

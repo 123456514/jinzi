@@ -8,10 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 
 
-/**
- * @author zhang
- * @date 2023/12/15 17:45
- */
 @NoArgsConstructor
 @Data
 public class Meta {

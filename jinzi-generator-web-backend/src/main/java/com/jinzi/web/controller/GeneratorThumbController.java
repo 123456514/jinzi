@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * 代码生成器点赞接口
  *
- * @author codeZhang
+ * @author zhoujin
  */
 @RestController
 @RequestMapping("/generator_thumb")

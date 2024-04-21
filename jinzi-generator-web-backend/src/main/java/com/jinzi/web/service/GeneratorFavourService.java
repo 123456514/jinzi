@@ -12,7 +12,7 @@ import com.jinzi.web.model.vo.UserVO;
 /**
  * 代码生成器收藏服务
  *
- * @author codeZhang
+ * @author zhoujin
  */
 public interface GeneratorFavourService extends IService<GeneratorFavour> {
 

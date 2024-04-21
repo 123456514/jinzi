@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 /**
  * 生成器收藏服务实现
  *
- * @author codeZhang
+ * @author zhoujin
  */
 @Service
 public class GeneratorFavourServiceImpl extends ServiceImpl<GeneratorFavourMapper, GeneratorFavour>

@@ -7,9 +7,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Author: QiMu
- * @Date: 2023/08/25 02:54:05
- * @Version: 1.0
  * @Description: 产品信息
  */
 @TableName(value = "product_info")

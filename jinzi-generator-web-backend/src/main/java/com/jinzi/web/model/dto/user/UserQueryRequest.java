@@ -18,17 +18,19 @@ public class UserQueryRequest extends PageRequest implements Serializable {
      */
     private Long id;
     /**
+     * 性别
+     */
+    private String gender;
+    /**
      * 用户昵称
      */
     private String userName;
-
     /**
-     * 简介
+     * 账号
      */
-    private String userProfile;
-
+    private String userAccount;
     /**
-     * 用户角色：user/admin/ban
+     * 用户角色: user, admin
      */
     private String userRole;
 

@@ -7,12 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 
-/**
- * @Author: QiMu
- * @Date: 2023/08/25 03:12:57
- * @Version: 1.0
- * @Description: 查询请求
- */
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class ProductInfoQueryRequest extends PageRequest implements Serializable {

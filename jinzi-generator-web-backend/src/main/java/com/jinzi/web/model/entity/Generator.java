@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 代码生成器
  *
- * @author azhang
+ * @author zhoujin
  */
 @TableName(value = "generator",autoResultMap = true)
 @Data

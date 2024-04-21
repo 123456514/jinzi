@@ -13,7 +13,6 @@ import org.apache.ibatis.annotations.Param;
 /**
  * 代码生成器收藏数据库操作
  *
- * @author codeZhang
  */
 public interface GeneratorFavourMapper extends BaseMapper<GeneratorFavour> {
 

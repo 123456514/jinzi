@@ -1,7 +1,7 @@
 package com.jinzi.web.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -24,7 +24,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -32,6 +31,7 @@ import org.springframework.util.DigestUtils;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -54,10 +54,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public static final String SALT = "jinzi";
 
     @Resource
-    private StringRedisTemplate stringRedisTemplate;
-
-
-    @Resource
     private RedissonLockUtil redissonLockUtil;
 
     @Resource
@@ -67,6 +63,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
 
+    /**
+     * 用户账号密码注册
+     * @param userRegisterRequest 注册请求信息
+     * @return 返回注册之后的用户Id
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public long userRegister(UserRegisterRequest userRegisterRequest) {
@@ -99,6 +100,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!userPassword.equals(checkPassword)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "两次输入的密码不一致");
         }
+        // 这里设置分布式锁，防止多个用户在不同的服务器上注册相同账号密码的用户，保证唯一性
         String redissonLock = ("userRegister_" + userAccount).intern();
         return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
             // 账户不能重复
@@ -129,6 +131,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 user.setBalance(100);
                 this.addWalletBalance(invitationCodeUser.getId(), 100);
             }
+            // 生成随机的8位数 作为邀请码
             user.setInvitationCode(generateRandomString(8));
             boolean saveResult = this.save(user);
             if (!saveResult) {
@@ -148,10 +151,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional(rollbackFor = Exception.class)
     public long userEmailRegister(UserEmailRegisterRequest userEmailRegisterRequest) {
         String emailAccount = userEmailRegisterRequest.getEmailAccount();
+        // 验证码
         String captcha = userEmailRegisterRequest.getCaptcha();
         String userName = userEmailRegisterRequest.getUserName();
         String invitationCode = userEmailRegisterRequest.getInvitationCode();
-
         if (StringUtils.isAnyBlank(emailAccount, captcha)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -162,6 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!Pattern.matches(emailPattern, emailAccount)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "不合法的邮箱地址！");
         }
+        // 在redis  缓存中得到用户的验证码，这里的验证码是一个时效值，过一分钟就会时效，没有必要存储在MySQL数据库中，在redis中设置验证码过期时间即可
         String cacheCaptcha = redisTemplate.opsForValue().get(CAPTCHA_CACHE_KEY + emailAccount);
         if (StringUtils.isBlank(cacheCaptcha)) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR, "验证码已过期,请重新获取");
@@ -189,8 +193,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                     throw new BusinessException(ErrorCode.OPERATION_ERROR, "该邀请码无效");
                 }
             }
-
-
             // 3. 插入数据
             User user = new User();
             user.setUserAccount(emailAccount);
@@ -210,7 +212,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
 
-
+    /**
+     * 用户 账号密码登录
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @param request 为了获得用户的登录态
+     * @return 返回脱敏 LoginUserVO
+     */
     @Override
     public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 1. 校验
@@ -235,9 +243,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             log.info("user login failed, userAccount cannot match userPassword");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
         }
-//        if(!"1".equals(user.getStatus())){
-//            throw new BusinessException(ErrorCode.FORBIDDEN_ERROR, "用户已被禁用");
-//        }
         // 3. 记录用户的登录态
         request.getSession().setAttribute(USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
@@ -290,7 +295,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userVO;
     }
 
-
+    /**
+     * 绑定电子邮件
+     *
+     * @param userEmailLoginRequest 用户电子邮件登录请求
+     * @param request               要求
+     * @return
+     */
     @Override
     public UserVO userBindEmail(UserBindEmailRequest userEmailLoginRequest, HttpServletRequest request) {
         String emailAccount = userEmailLoginRequest.getEmailAccount();
@@ -333,6 +344,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return loginUser;
     }
 
+    /**
+     * 解绑电子邮件
+     *
+     * @param userUnBindEmailRequest 用户取消绑定电子邮件请求
+     * @param request                要求
+     * @return
+     */
     @Override
     public UserVO userUnBindEmail(UserUnBindEmailRequest userUnBindEmailRequest, HttpServletRequest request) {
         String emailAccount = userUnBindEmailRequest.getEmailAccount();
@@ -481,6 +499,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userList.stream().map(this::getUserVO).collect(Collectors.toList());
     }
 
+    /**
+     * 整合查询参数
+     *
+     * @param userQueryRequest
+     * @return
+     */
     @Override
     public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
         if (userQueryRequest == null) {
@@ -488,19 +512,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         Long id = userQueryRequest.getId();
         String userName = userQueryRequest.getUserName();
-        String userProfile = userQueryRequest.getUserProfile();
+//        String userProfile = userQueryRequest.getUserProfile();
         String userRole = userQueryRequest.getUserRole();
         String sortField = userQueryRequest.getSortField();
         String sortOrder = userQueryRequest.getSortOrder();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(StringUtils.isNotBlank(userRole), "userRole", userRole);
-        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
+//        queryWrapper.like(StringUtils.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.like(StringUtils.isNotBlank(userName), "userName", userName);
         queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
                 sortField);
         return queryWrapper;
     }
+
+    /**
+     * 添加余额
+     * @param userId    用户id
+     * @param addPoints 添加点
+     * @return
+     */
     @Override
     public boolean addWalletBalance(Long userId, Integer addPoints) {
         LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
@@ -526,6 +557,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return sb.toString();
     }
+
+    /**
+     * 校验用户信息
+     * @param user 接口信息
+     * @param add  是否为创建校验
+     */
     @Override
     public void validUser(User user, boolean add) {
         if (user == null) {
@@ -566,4 +603,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
     }
+
 }

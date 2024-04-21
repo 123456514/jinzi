@@ -5,12 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @Author: QiMu
- * @Date: 2023/08/25 02:50:48
- * @Version: 1.0
- * @Description: 更新请求
- */
+
 @Data
 public class ProductInfoUpdateRequest implements Serializable {
 

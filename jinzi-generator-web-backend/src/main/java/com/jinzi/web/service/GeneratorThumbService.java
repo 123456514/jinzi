@@ -9,7 +9,7 @@ import com.jinzi.web.model.vo.UserVO;
 /**
  * 生成器点赞服务
  *
- * @author codeZhang
+ * @author zhoujin
  */
 public interface GeneratorThumbService extends IService<GeneratorThumb> {
 

@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @Author: QiMu
- * @Date: 2023/08/25 05:02:49
- * @Version: 1.0
  * @Description: 产品类型状态枚举
  */
 public enum ProductTypeStatusEnum {

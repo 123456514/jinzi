@@ -5,9 +5,6 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @Author: QiMu
- * @Date: 2023/09/10 10:33:34
- * @Version: 1.0
  * @Description: 用户绑定电子邮件请求
  */
 @Data

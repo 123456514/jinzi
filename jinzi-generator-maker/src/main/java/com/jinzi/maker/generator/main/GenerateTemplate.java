@@ -48,6 +48,32 @@ public abstract class GenerateTemplate {
     }
 
     /**
+     * 生成
+     * @throws TemplateException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void doGenerate(Meta meta,String outputPath) throws TemplateException, IOException, InterruptedException {
+        if (!FileUtil.exist(outputPath)) {
+            FileUtil.mkdir(outputPath);
+        }
+        // 1、复制原始文件
+        String sourceCopyDestPath = copySource(meta, outputPath);
+
+        // 2、代码生成
+        generateCode(meta, outputPath);
+
+        // 3、构建 jar 包
+        String jarPath = buildJar(meta, outputPath);
+
+        // 4、封装脚本
+        String shellOutputFilePath = buildScript(outputPath, jarPath);
+
+        // 5、生成精简版的程序（产物包）
+        buildDist(outputPath, sourceCopyDestPath, jarPath, shellOutputFilePath);
+
+    }
+    /**
      * 复制原始文件
      *
      * @param meta
@@ -61,8 +87,9 @@ public abstract class GenerateTemplate {
         return sourceCopyDestPath;
     }
 
+
     /**
-     * 代码生成
+     * 生成
      * @param meta
      * @param outputPath
      * @throws IOException

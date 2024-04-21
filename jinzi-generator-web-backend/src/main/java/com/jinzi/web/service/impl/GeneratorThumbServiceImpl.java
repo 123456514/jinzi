@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 /**
  * 代码生成器点赞服务实现
  *
- * @author codeZhang
+ * @author zhoujin
  */
 @Service
 public class GeneratorThumbServiceImpl extends ServiceImpl<GeneratorThumbMapper, GeneratorThumb>
