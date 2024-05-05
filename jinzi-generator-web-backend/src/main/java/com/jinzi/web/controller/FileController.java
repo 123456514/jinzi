@@ -14,7 +14,6 @@ import com.jinzi.web.model.entity.User;
 import com.jinzi.web.model.enums.FileUploadBizEnum;
 import com.jinzi.web.model.enums.ImageStatusEnum;
 import com.jinzi.web.model.vo.ImageVo;
-import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.UserService;
 import com.qcloud.cos.model.COSObject;
@@ -192,6 +191,7 @@ public class FileController {
             file = File.createTempFile(filepath, null);
             multipartFile.transferTo(file);
             cosManager.putObject(filepath, file);
+            log.info("上传成功");
             return ResultUtils.success(filepath);
         } catch (Exception e) {
             log.error("file upload error, filepath = " + filepath, e);

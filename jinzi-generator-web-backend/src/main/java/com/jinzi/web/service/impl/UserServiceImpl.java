@@ -29,6 +29,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -390,6 +391,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         BeanUtils.copyProperties(retUser,loginUser);
         return retUser;
     }
+    public static boolean isThirdLastCharacterDot(String str) {
+        // 检查字符串长度是否至少为3，因为我们需要访问倒数第四个字符
+        if (str.length() < 4) {
+            return false;
+        }
+
+        // 计算倒数第三个字符的索引
+        int index = str.length() - 4;
+
+        // 使用charAt方法获取该位置的字符，并检查它是否是"."
+        return str.charAt(index) == '.';
+    }
     /**
      * 获取当前登录用户
      *
@@ -400,7 +413,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+        User currentUser = new User();
+        Class<?> clazz = userObj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        List<String> fieldList = new ArrayList<>();
+        for (Field field : fields) {
+            // 设置为可访问，以便访问私有字段
+            field.setAccessible(true);
+            fieldList.add(field.getName());
+        }
+        if(!fieldList.contains("userPassword")){
+            currentUser.setId(((UserVO) userObj).getId());
+            currentUser.setUserName(((UserVO) userObj).getUserName());
+            currentUser.setEmail(((UserVO) userObj).getEmail());
+            currentUser.setUserAccount(((UserVO) userObj).getUserAccount());
+            currentUser.setGender(((UserVO) userObj).getGender());
+            currentUser.setUserAvatar(((UserVO) userObj).getUserAvatar());
+            currentUser.setUserProfile(((UserVO) userObj).getUserProfile());
+            currentUser.setUserRole(((UserVO) userObj).getUserRole());
+            currentUser.setBalance(((UserVO) userObj).getBalance());
+            currentUser.setInvitationCode(((UserVO) userObj).getInvitationCode());
+            currentUser.setCreateTime(((UserVO) userObj).getCreateTime());
+            currentUser.setUpdateTime(((UserVO) userObj).getCreateTime());
+        }else{
+            currentUser = (User) userObj;
+        }
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
@@ -423,7 +460,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getLoginUserPermitNull(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User currentUser = (User) userObj;
+
+        User currentUser = new User();
+        Class<?> clazz = userObj.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        List<String> fieldList = new ArrayList<>();
+        for (Field field : fields) {
+            // 设置为可访问，以便访问私有字段
+            field.setAccessible(true);
+            fieldList.add(field.getName());
+        }
+        if(!fieldList.contains("userPassword")){
+            currentUser.setId(((UserVO) userObj).getId());
+            currentUser.setUserName(((UserVO) userObj).getUserName());
+            currentUser.setEmail(((UserVO) userObj).getEmail());
+            currentUser.setUserAccount(((UserVO) userObj).getUserAccount());
+            currentUser.setGender(((UserVO) userObj).getGender());
+            currentUser.setUserAvatar(((UserVO) userObj).getUserAvatar());
+            currentUser.setUserProfile(((UserVO) userObj).getUserProfile());
+            currentUser.setUserRole(((UserVO) userObj).getUserRole());
+            currentUser.setBalance(((UserVO) userObj).getBalance());
+            currentUser.setInvitationCode(((UserVO) userObj).getInvitationCode());
+            currentUser.setCreateTime(((UserVO) userObj).getCreateTime());
+            currentUser.setUpdateTime(((UserVO) userObj).getCreateTime());
+        }else{
+            currentUser = (User) userObj;
+        }
+
         if (currentUser == null || currentUser.getId() == null) {
             return null;
         }
@@ -442,6 +505,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public boolean isAdmin(HttpServletRequest request) {
         // 仅管理员可查询
         Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userObj,userVO);
+        if(userVO.getUserRole().equals("user")){
+            return false;
+        }
         User user = (User) userObj;
         return isAdmin(user);
     }

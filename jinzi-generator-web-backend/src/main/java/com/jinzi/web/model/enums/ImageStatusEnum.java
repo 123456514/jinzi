@@ -3,7 +3,7 @@ package com.jinzi.web.model.enums;
 /**
  * 错误码
  *
- * @author qimu
+
  */
 public enum ImageStatusEnum {
     /**

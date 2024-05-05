@@ -14,23 +14,22 @@ import {
 } from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import {RcFile} from "antd/es/upload";
-import {EditOutlined, PlusOutlined, VerticalAlignBottomOutlined} from "@ant-design/icons";
+import  {EditOutlined, PlusOutlined } from "@ant-design/icons";
 import ImgCrop from "antd-img-crop";
 import {
   getLoginUserUsingGET,
   updateUserUsingPOST,
-  updateVoucherUsingPOST,
   userBindEmailUsingPOST,
   userUnBindEmailUsingPOST
 } from "@/services/backend/userController";
 import Settings from '../../../../config/defaultSettings';
 import Paragraph from "antd/lib/typography/Paragraph";
 import ProCard from "@ant-design/pro-card";
-import {requestConfig} from "@/requestConfig";
+
 import {doDailyCheckInUsingPOST} from "@/services/backend/dailyCheckInController";
 import SendGiftModal from "@/components/Gift/SendGift";
 import EmailModal from '@/components/EmailModel';
-import {COS_HOST} from "@/constants";
+
 export const valueLength = (val: any) => {
   return val && val.trim().length > 0
 }
@@ -39,7 +38,6 @@ const UserInfo: React.FC = () => {
   const {initialState, setInitialState} = useModel('@@initialState');
   const {loginUser} = initialState || {}
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [voucherLoading, setVoucherLoading] = useState<boolean>(false);
   const [dailyCheckInLoading, setDailyCheckInLoading] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
@@ -47,6 +45,7 @@ const UserInfo: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const handleCancel = () => setPreviewOpen(false);
   const [userName, setUserName] = useState<string | undefined>('');
+  const [userProfile,setUserProfile] = useState<string | undefined>('');
   const [open, setOpen] = useState(false);
   const [openEmailModal, setOpenEmailModal] = useState(false);
 
@@ -92,6 +91,7 @@ const UserInfo: React.FC = () => {
         setFileList(updatedFileList);
       }
       setUserName(loginUser?.userName)
+      setUserProfile(loginUser?.userProfile)
       setLoading(false)
     }
     // PC端显示指引
@@ -174,7 +174,8 @@ const UserInfo: React.FC = () => {
       // @ts-ignore
       userAvatar: avatarUrl,
       id: loginUser?.id,
-      userName: userName
+      userName: userName,
+      userProfile: userProfile
     })
     console.log(res.data)
     if (res.data && res.code === 0) {
@@ -357,20 +358,36 @@ const UserInfo: React.FC = () => {
                 {valueLength(loginUser?.email) ? loginUser?.email : '未绑定邮箱'}
               </Paragraph>
             </div>
+            <div>
+              <h4>简介：</h4>
+              <Paragraph
+                editable={
+                  {
+                    icon: <EditOutlined/>,
+                    tooltip: '编辑',
+                    onChange: (value) => {
+                      setUserProfile(value)
+                    }
+                  }
+                }
+              >
+                {valueLength(userProfile) ? userProfile : '介绍一下你自己吧！！！'}
+              </Paragraph>
+            </div>
           </Descriptions>
         </ProCard>
-        <br/>
-        <ProCard ref={ref2} type={"inner"} bordered tooltip={"用于平台接口调用"} title={<strong>我的钱包</strong>}
-                 extra={
-                   <>
-                     <Button onClick={() => {
-                       history.push("/recharge/list")
-                     }}>充值余额</Button>
-                   </>
-                 }
-        >
-          <strong>坤币 💰: </strong> <span
-          style={{color: "red", fontSize: 18}}>{loginUser?.balance}</span>
+      <br/>
+      <ProCard ref={ref2} type={"inner"} bordered tooltip={"用于平台接口调用"} title={<strong>我的钱包</strong>}
+               extra={
+                 <>
+                   <Button onClick={() => {
+                     history.push("/recharge/list")
+                   }}>充值余额</Button>
+                 </>
+               }
+      >
+        <strong>坤币 💰: </strong> <span
+        style={{color: "red", fontSize: 18}}>{loginUser?.balance}</span>
           <br/>
           <strong>获取更多：</strong>
           <br/>

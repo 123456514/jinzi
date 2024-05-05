@@ -10,12 +10,6 @@ import com.jinzi.web.model.vo.UserVO;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-/**
- * @Author: QiMu
- * @Date: 2023年08月25日 22:22
- * @Version: 1.0
- * @Description:
- */
 public interface OrderService {
     /**
      * 处理订单通知

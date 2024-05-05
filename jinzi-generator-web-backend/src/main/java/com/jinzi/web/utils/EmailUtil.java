@@ -16,12 +16,7 @@ import java.text.MessageFormat;
 
 import static com.jinzi.web.constant.EmailConstant.*;
 
-/**
- * @Author: QiMu
- * @Date: 2023/09/03 08:51:11
- * @Version: 1.0
- * @Description: 电子邮件生成内容实用程序
- */
+
 @Slf4j
 public class EmailUtil {
 

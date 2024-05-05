@@ -1,11 +1,6 @@
 package com.jinzi.web.constant;
 
-/**
- * @Author: QiMu
- * @Date: 2023/08/24 11:37:12
- * @Version: 1.0
- * @Description: 支付常数
- */
+
 public interface PayConstant {
     /**
      * 查询订单状态Key

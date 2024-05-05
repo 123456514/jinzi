@@ -1,11 +1,6 @@
 package com.jinzi.web.constant;
 
-/**
- * @Author: QiMu
- * @Date: 2023/09/03 11:24:40
- * @Version: 1.0
- * @Description: 电子邮件常量
- */
+
 public interface EmailConstant {
 
     /**

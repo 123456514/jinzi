@@ -4,12 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * @Author: QiMu
- * @Date: 2023/08/24 09:55:50
- * @Version: 1.0
- * @Description: 阿里支付账户配置
- */
+
 @Data
 @ConfigurationProperties(prefix = "alipay")
 @Component

@@ -12,12 +12,7 @@ import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-/**
- * @Author: QiMu
- * @Date: 2023/09/11 11:11:26
- * @Version: 1.0
- * @Description: Redisson Lock Utils
- */
+
 @Slf4j
 @Component
 public class RedissonLockUtil {

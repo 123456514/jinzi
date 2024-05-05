@@ -8,12 +8,7 @@ import com.jinzi.web.model.vo.UserVO;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * @Author: QiMu
- * @Date: 2023/08/23 03:12:50
- * @Version: 1.0
- * @Description: 接口订单服务
- */
+
 public interface ProductOrderService extends IService<ProductOrder> {
 
     /**

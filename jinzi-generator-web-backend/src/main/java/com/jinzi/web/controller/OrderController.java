@@ -38,12 +38,7 @@ import static com.jinzi.web.constant.PayConstant.QUERY_ORDER_STATUS;
 import static com.jinzi.web.model.enums.ImageStatusEnum.SUCCESS;
 
 
-/**
- * @Author: QiMu
- * @Date: 2023年08月23日 00:13
- * @Version: 1.0
- * @Description:
- */
+
 @RestController
 @Slf4j
 @RequestMapping("/order")

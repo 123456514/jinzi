@@ -5,12 +5,7 @@ import com.github.binarywang.wxpay.bean.notify.SignatureHeader;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * @Author: QiMu
- * @Date: 2023/09/03 08:51:32
- * @Version: 1.0
- * @Description: wx 签名工具类
- */
+
 public class WxPayUtil {
     /**
      * 获取回调请求头：签名相关

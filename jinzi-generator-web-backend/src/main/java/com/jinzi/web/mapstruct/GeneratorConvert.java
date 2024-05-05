@@ -1,6 +1,5 @@
 package com.jinzi.web.mapstruct;
 
-import com.jinzi.web.model.dto.generator.GeneratorAddRequest;
 import com.jinzi.web.model.dto.generator.GeneratorEditRequest;
 import com.jinzi.web.model.dto.generator.GeneratorQueryRequest;
 import com.jinzi.web.model.dto.generator.GeneratorUpdateRequest;

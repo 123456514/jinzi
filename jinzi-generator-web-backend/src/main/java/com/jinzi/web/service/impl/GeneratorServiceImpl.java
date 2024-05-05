@@ -1,6 +1,8 @@
 package com.jinzi.web.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -8,6 +10,8 @@ import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.constant.CommonConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
+import com.jinzi.web.manager.CosManager;
+import com.jinzi.web.manager.LocalFileCacheManager;
 import com.jinzi.web.mapper.GeneratorFavourMapper;
 import com.jinzi.web.mapper.GeneratorMapper;
 import com.jinzi.web.mapper.GeneratorThumbMapper;
@@ -29,10 +33,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -51,6 +52,14 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
 
     @Resource
     private GeneratorFavourMapper generatorFavourMapper;
+
+    @Resource
+    private GeneratorMapper generatorMapper;
+
+    @Resource
+    private CosManager cosManager;
+
+
 
 
     @Override
@@ -193,6 +202,45 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }).collect(Collectors.toList());
         generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
+    }
+    @Override
+    public void cacheGenerators(List<Long> idList) {
+        for (Long id : idList) {
+            if (id <= 0) {
+                continue;
+            }
+            log.info("cache generator, id = {}", id);
+            Generator generator = this.getById(id);
+            if (Objects.isNull(generator)) {
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
+            }
+            String distPath = generator.getDistPath();
+            if (StrUtil.isBlank(distPath)) {
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+            }
+
+            String zipFilePath = LocalFileCacheManager.getCacheFilePath(id, distPath);
+
+            if (FileUtil.exist(zipFilePath)) {
+                FileUtil.del(zipFilePath);
+            }
+            FileUtil.touch(zipFilePath);
+
+            try {
+                cosManager.download(distPath, zipFilePath);
+                // 给缓存设置过期时间
+                LocalFileCacheManager.updateCacheExpiration(zipFilePath);
+            } catch (InterruptedException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+            }
+        }
+    }
+    @Override
+    public List<Generator> getBatchByIds(List<Long> idList) {
+        if (CollUtil.isEmpty(idList)) {
+            return Collections.emptyList();
+        }
+        return generatorMapper.selectBatchIds(idList);
     }
 }
 

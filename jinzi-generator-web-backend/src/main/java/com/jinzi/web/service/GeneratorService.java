@@ -8,6 +8,7 @@ import com.jinzi.web.model.entity.Generator;
 import com.jinzi.web.model.vo.GeneratorVO;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 帖子服务
@@ -50,4 +51,16 @@ public interface GeneratorService extends IService<Generator> {
      * @return
      */
     Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request);
+
+
+
+    void cacheGenerators(List<Long> idList);
+
+    /**
+     * 批量获取
+     *
+     * @param idList
+     * @return
+     */
+    List<Generator> getBatchByIds(List<Long> idList);
 }

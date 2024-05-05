@@ -1,5 +1,6 @@
 package com.jinzi.web.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.*;
 import cn.hutool.json.JSONUtil;
@@ -18,6 +19,7 @@ import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
 import com.jinzi.web.manager.CacheManager;
 import com.jinzi.web.manager.CosManager;
+import com.jinzi.web.manager.LocalFileCacheManager;
 import com.jinzi.web.mapstruct.GeneratorConvert;
 import com.jinzi.web.model.dto.generator.*;
 import com.jinzi.web.model.entity.Generator;
@@ -43,8 +45,10 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.jinzi.web.manager.LocalFileCacheManager.getCacheFilePath;
 
@@ -94,7 +98,6 @@ public class GeneratorController {
         dishPathInfo distPath = generatorAddRequest.getDistPath();
         Integer status = generatorAddRequest.getStatus();
 
-//        Generator generator = GeneratorConvert.INSTANCE.convertGeneratorByAddRequest(generatorAddRequest);
         Generator generator = new Generator();
         generator.setName(name);
         generator.setDescription(description);
@@ -286,21 +289,23 @@ public class GeneratorController {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        // 1. 判断用户是否登录
         User loginUser = userService.getLoginUser(request);
+        // 2. 根据id 得到对应的代码生成器
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-
+        // 3. 得到产物包路径
         String filepath = generator.getDistPath();
         if (StrUtil.isBlank(filepath)) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
 
-        // 追踪事件
+        // 4. 追踪事件
         log.info("用户 {} 下载了 {}", loginUser, filepath);
 
-        // 设置响应头
+        // 5. 设置响应头
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
 
@@ -311,9 +316,18 @@ public class GeneratorController {
             Files.copy(Paths.get(zipFilePath), response.getOutputStream());
             return;
         }
-
+        int lastIndex = filepath.lastIndexOf('/');
+        int secondLastIndex = lastIndex != 0 ? filepath.lastIndexOf('/', lastIndex - 1) : -1;
+        int thirdLastIndex = secondLastIndex != 0 ? filepath.lastIndexOf('/', secondLastIndex - 1) : -1;
+        if (thirdLastIndex != -1) {
+            filepath= filepath.substring(thirdLastIndex);
+            System.out.println(filepath); // 输出类似: /path/to/file.txt
+        } else {
+            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
+        }
         COSObjectInputStream cosObjectInput = null;
         try {
+            // 计算下载耗时，从对象存储 获取生成器
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
@@ -527,5 +541,38 @@ public class GeneratorController {
         CompletableFuture.runAsync(() -> {
             FileUtil.del(tempDirPath);
         });
+    }
+    /**
+     * 缓存代码生成器
+     */
+    @PostMapping("/cache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void cacheGenerator(@RequestBody GeneratorCacheRequest generatorCacheRequest) {
+        List<Long> idList = generatorCacheRequest.getIdList();
+        if (CollUtil.isEmpty(idList)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+
+        generatorService.cacheGenerators(idList);
+    }
+
+
+    @DeleteMapping("/del/cache")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public void delCache(@RequestBody GeneratorDelCacheRequest generatorDelCacheRequest) {
+        if (Objects.isNull(generatorDelCacheRequest) || CollUtil.isEmpty(
+                generatorDelCacheRequest.getIds())) {
+            LocalFileCacheManager.clearExpireCache();
+            return;
+        }
+
+        List<Long> ids = generatorDelCacheRequest.getIds();
+        List<Generator> generatorList = generatorService.getBatchByIds(ids);
+        List<String> cacheKeyList = generatorList.stream()
+                .filter(generator -> StrUtil.isNotBlank(generator.getDistPath()))
+                .map(generator -> LocalFileCacheManager.getCacheFilePath(generator.getId(),
+                        generator.getDistPath()))
+                .collect(Collectors.toList());
+        LocalFileCacheManager.clearCache(cacheKeyList);
     }
 }
