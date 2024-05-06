@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- *  签到接口
+ *  签到接口  定时任务
  */
 @RestController
 @RequestMapping("/dailyCheckIn")

@@ -6,7 +6,6 @@ package com.jinzi.web.controller;
  import com.jinzi.web.common.ResultUtils;
  import com.jinzi.web.exception.BusinessException;
  import com.jinzi.web.exception.ThrowUtils;
- import com.jinzi.web.manager.AiManager;
  import com.jinzi.web.manager.RedisLimiterManager;
  import com.jinzi.web.model.dto.aiassistant.GenChatByAiRequest;
  import com.jinzi.web.model.entity.AiAssistant;
@@ -34,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("/aiAssistant")
 @Slf4j
-//@CrossOrigin(origins = "http://140.143.151.205:80", allowCredentials = "true")
 public class AiAssitantController {
 
     @Resource
@@ -43,8 +41,6 @@ public class AiAssitantController {
     @Resource
     private RedisLimiterManager redisLimiterManager;
 
-    @Resource
-    private AiManager aiManager;
 
     @Resource
     private AiAssistantService aiAssistantService;
