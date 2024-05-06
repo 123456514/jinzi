@@ -644,5 +644,21 @@ declare namespace API {
     data?: PageUserVO;
     message?: string;
   };
+  type GenChatByAiRequest = {
+    questionGoal?: string;
+    questionName?: string;
+    questionType?: string;
+  };
+  type BaseResponseObject_ = {
+    code?: number;
+    data?: Record<string, any>;
+    message?: string;
+  };
+
+  type BiResponse = {
+    chartId?: number;
+    genChart?: string;
+    genResult?: string;
+  };
 
 }

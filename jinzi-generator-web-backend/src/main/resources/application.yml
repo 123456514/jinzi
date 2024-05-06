@@ -53,6 +53,13 @@ mybatis-plus:
       logic-delete-field: isDelete # 全局逻辑删除的实体字段名
       logic-delete-value: 1 # 逻辑已删除值（默认为 1）
       logic-not-delete-value: 0 # 逻辑未删除值（默认为 0）
+
+# 鱼聪明 AI 配置（https://yucongming.com/）
+yuapi:
+  client:
+    access-key: ngf80i6i8mwnfh2zrmm47edxsf8xwil6
+    secret-key: nqe8gq1jpt5fa5iqo4j5spwvsaesalj1
+
 # 接口文档配置
 knife4j:
   enable: true

@@ -7,17 +7,19 @@ import picocli.CommandLine;
 import java.lang.reflect.Field;
 
 /**
- * 用户输入 --config 或者 -c 指令 给用户显示 交互的字段信息
+ * @author ${author}
+ * @date ${.now}
+ * @description 配置命令
  */
-@CommandLine.Command(name = "config",mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "config", description = "配置命令",mixinStandardHelpOptions = true)
 public class ConfigCommand implements Runnable{
 
     @Override
     public void run() {
-        Field[] fields = ReflectUtil.getFields(DataModel.class);
-        for(Field field : fields){
-            System.out.println("字段类型 :" + field.getType());
-            System.out.println("字段名称 :" + field.getName());
+        Field[] fields =
+                ReflectUtil.getFields(DataModel.class);
+        for (Field field : fields) {
+            System.out.println(field.getName() + " : " + field.getType().getName());
         }
     }
 }

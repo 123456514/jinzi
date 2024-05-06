@@ -47,6 +47,8 @@ create table if not exists generator
     thumbNum                int      default 0                 not null comment '点赞数',
     favourNum               int      default 0                 not null comment '收藏数',
     userId                  bigint                             not null comment '创建用户 id',
+    useCount      INT      DEFAULT 0                 NOT NULL COMMENT '使用次数',
+    downloadCount INT      DEFAULT 0                 NOT NULL COMMENT '下载次数',
     createTime              datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime              datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete                tinyint  default 0                 not null comment '是否删除',
@@ -200,3 +202,21 @@ INSERT INTO product_info (id, name, description, userId, total, addPoints, produ
 INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695777203236556802, '15999坤币', '增加15999坤币到钱包', 1691069533871013889, 888, 15999, 'RECHARGE', 1, null, '2023-08-27 20:36:05', '2023-08-28 13:02:25', 0);
 INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1695778320091631617, '18999坤币', '增加18999坤币到钱包', 1691069533871013889, 999, 18999, 'RECHARGE', 1, null, '2023-08-27 20:40:32', '2023-08-28 13:02:42', 0);
 INSERT INTO product_info (id, name, description, userId, total, addPoints, productType, status, expirationTime, createTime, updateTime, isDelete) VALUES (1697087470134259713, '10坤币', '签到获取', 1692848556158709762, 0, 10, 'RECHARGE', 0, null, '2023-08-31 11:22:37', '2023-08-31 11:22:37', 1);
+
+
+
+-- AI 问答助手表
+create table if not exists ai_assistant
+(
+    id             bigint auto_increment comment 'id' primary key,
+    questionName   varchar(256)                           null comment '问题名称',
+    questionGoal   text                                   null comment '问题概述',
+    questionResult text                                   null comment '问答结果',
+    questionType   varchar(512)                           null comment '问题类型',
+    questionStatus varchar(128) default 'wait'            not null default 'wait' comment 'wait-等待,running-生成中,succeed-成功生成,failed-生成失败',
+    execMessage    text                                   null comment '执行信息',
+    userId         bigint                                 null comment '创建用户 id',
+    createTime     datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime     datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete       tinyint      default 0                 not null comment '是否删除'
+) comment 'AI 问答助手信息表' collate = utf8mb4_unicode_ci;

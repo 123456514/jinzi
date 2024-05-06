@@ -10,6 +10,8 @@
         <result property="thumbNum" column="thumbNum" jdbcType="BIGINT"/>
         <result property="favourNum" column="favourNum" jdbcType="BIGINT"/>
         <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="useCount" column="useCount" jdbcType="INTEGER"/>
+        <result property="downloadCount" column="downloadCount" jdbcType="INTEGER"/>
         <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
         <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
@@ -17,7 +19,7 @@
 
     <sql id="Base_Column_List">
         id,title,content,tags,
-        thumbNum,favourNum,userId,
+        thumbNum,favourNum,userId,downloadCount,createTime,
         createTime,updateTime,isDelete
     </sql>
 

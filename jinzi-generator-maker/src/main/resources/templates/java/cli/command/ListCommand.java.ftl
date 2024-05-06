@@ -7,18 +7,19 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 作用是遍历输出所有要生成的文件列表
+ * @author ${author}
+ * @date ${.now}
+ * @description 列表命令
  */
-@CommandLine.Command(name = "list",mixinStandardHelpOptions = true)
-public class ListCommand implements Runnable{
+@CommandLine.Command(name = "list", description = "查看文件列表", mixinStandardHelpOptions = true)
+public class ListCommand implements Runnable {
 
     @Override
     public void run() {
-        // 输入路径
         String inputPath = "${fileConfig.inputRootPath}";
         List<File> files = FileUtil.loopFiles(inputPath);
-        for (File file : files) {
-            System.out.println(file);
+        for (File f : files) {
+            System.out.println(f.getName());
         }
     }
 }

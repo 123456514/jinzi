@@ -15,7 +15,7 @@ import {
 import React, {useEffect, useRef, useState} from 'react';
 import {RcFile} from "antd/es/upload";
 import  {EditOutlined, PlusOutlined } from "@ant-design/icons";
-import ImgCrop from "antd-img-crop";
+// import ImgCrop from 'antd-img-crop';
 import {
   getLoginUserUsingGET,
   updateUserUsingPOST,
@@ -298,19 +298,19 @@ const UserInfo: React.FC = () => {
           bordered
         >
           <Descriptions.Item>
-            <ImgCrop
-              rotationSlider
-              quality={1}
-              aspectSlider
-              maxZoom={4}
-              cropShape={"round"}
-              zoomSlider
-              showReset
-            >
-              <Upload {...props}>
-                {fileList.length >= 1 ? undefined : uploadButton()}
-              </Upload>
-            </ImgCrop>
+            {/*<ImgCrop*/}
+            {/*  rotationSlider*/}
+            {/*  quality={1}*/}
+            {/*  aspectSlider*/}
+            {/*  maxZoom={4}*/}
+            {/*  cropShape={"round"}*/}
+            {/*  zoomSlider*/}
+            {/*  showReset*/}
+            {/*>*/}
+            {/*  <Upload {...props}>*/}
+            {/*    {fileList.length >= 1 ? undefined : uploadButton()}*/}
+            {/*  </Upload>*/}
+            {/*</ImgCrop>*/}
             <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
               <img alt="example" style={{width: '100%'}} src={previewImage}/>
             </Modal>

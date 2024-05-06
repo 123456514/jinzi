@@ -277,81 +277,28 @@ public class GeneratorController {
         boolean result = generatorService.updateById(generator);
         return ResultUtils.success(result);
     }
-
-
-    /**
-     * 根据 id 下载
-     *
-     * @param id 文件 id
-     */
     @GetMapping("/download")
-    public void downloadGeneratorById(long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (id <= 0) {
+    public void downloadGeneratorById(Long id, HttpServletRequest request,
+                                      HttpServletResponse response) throws IOException {
+        if (id == null || id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        // 1. 判断用户是否登录
+
         User loginUser = userService.getLoginUser(request);
-        // 2. 根据id 得到对应的代码生成器
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
-        // 3. 得到产物包路径
+
         String filepath = generator.getDistPath();
         if (StrUtil.isBlank(filepath)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包路径不存在");
         }
 
-        // 4. 追踪事件
-        log.info("用户 {} 下载了 {}", loginUser, filepath);
+        // 追踪事件
+        log.info("user {} download {}", loginUser, filepath);
 
-        // 5. 设置响应头
-        response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
-
-        // 优先从缓存读取
-        String zipFilePath = getCacheFilePath(id, filepath);
-        if (FileUtil.exist(zipFilePath)) {
-            // 写入响应
-            Files.copy(Paths.get(zipFilePath), response.getOutputStream());
-            return;
-        }
-        int lastIndex = filepath.lastIndexOf('/');
-        int secondLastIndex = lastIndex != 0 ? filepath.lastIndexOf('/', lastIndex - 1) : -1;
-        int thirdLastIndex = secondLastIndex != 0 ? filepath.lastIndexOf('/', secondLastIndex - 1) : -1;
-        if (thirdLastIndex != -1) {
-            filepath= filepath.substring(thirdLastIndex);
-            System.out.println(filepath); // 输出类似: /path/to/file.txt
-        } else {
-            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
-        }
-        COSObjectInputStream cosObjectInput = null;
-        try {
-            // 计算下载耗时，从对象存储 获取生成器
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-
-            COSObject cosObject = cosManager.getObject(filepath);
-            cosObjectInput = cosObject.getObjectContent();
-            // 处理下载到的流
-            byte[] bytes = IOUtils.toByteArray(cosObjectInput);
-
-            stopWatch.stop();
-
-            log.info("下载产物包耗时 {} ms", stopWatch.getTotalTimeMillis());
-
-
-            // 写入响应
-            response.getOutputStream().write(bytes);
-            response.getOutputStream().flush();
-        } catch (Exception e) {
-            log.error("file download error, filepath = " + filepath, e);
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载失败");
-        } finally {
-            if (cosObjectInput != null) {
-                cosObjectInput.close();
-            }
-        }
+        generatorService.downloadGenerator(generator, response);
     }
     /**
      * 在线使用代码生成器

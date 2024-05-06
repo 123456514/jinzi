@@ -26,6 +26,9 @@ import com.jinzi.web.model.vo.UserVO;
 import com.jinzi.web.service.GeneratorService;
 import com.jinzi.web.service.UserService;
 import com.jinzi.web.utils.SqlUtils;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.COSObjectInputStream;
+import com.qcloud.cos.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +36,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -58,6 +66,27 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
 
     @Resource
     private CosManager cosManager;
+
+
+    private static final ExecutorService CLEAN_UP_POOL = new ThreadPoolExecutor(
+            1,
+            5,
+            60L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(100),
+            r -> new Thread(r, "clean-up-thread"),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
+
+    private static final ExecutorService INCR_COUNT_POOL = new ThreadPoolExecutor(
+            1,
+            5,
+            60L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(100),
+            r -> new Thread(r, "clean-up-thread"),
+            new ThreadPoolExecutor.AbortPolicy()
+    );
 
 
 
@@ -242,6 +271,66 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }
         return generatorMapper.selectBatchIds(idList);
     }
+
+
+    @Override
+    public void downloadGenerator(Generator generator, HttpServletResponse response) throws IOException {
+        String filepath = generator.getDistPath();
+        Long id = generator.getId();
+        // 设置响应头
+        response.setContentType("application/octet-stream;charSet=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+
+        // 查询本地缓存
+        String zipFilePath = LocalFileCacheManager.getCacheFilePath(id, generator.getDistPath());
+        if (FileUtil.exist(zipFilePath)) {
+            log.info("download generator from cache, id = {}", id);
+            // 从缓存下载
+            Files.copy(Paths.get(zipFilePath), response.getOutputStream());
+            return;
+        }
+        int lastIndex = filepath.lastIndexOf('/');
+        int secondLastIndex = lastIndex != 0 ? filepath.lastIndexOf('/', lastIndex - 1) : -1;
+        int thirdLastIndex = secondLastIndex != 0 ? filepath.lastIndexOf('/', secondLastIndex - 1) : -1;
+        if (thirdLastIndex != -1) {
+            filepath= filepath.substring(thirdLastIndex);
+            System.out.println(filepath); // 输出类似: /path/to/file.txt
+        } else {
+            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
+        }
+
+        // 从对象存储下载
+        COSObjectInputStream cosObjectInput = null;
+        try {
+            COSObject cosObject = cosManager.getObject(filepath);
+            cosObjectInput = cosObject.getObjectContent();
+            // 处理下载到的流
+            byte[] bytes = IOUtils.toByteArray(cosObjectInput);
+
+            // 写入响应
+            response.getOutputStream().write(bytes);
+            response.getOutputStream().flush();
+        } catch (Exception e) {
+            log.error("file download error, filepath = " + filepath, e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载失败");
+        } finally {
+            if (cosObjectInput != null) {
+                cosObjectInput.close();
+            }
+            CompletableFuture.runAsync(() ->incrDownloadCount(generator), INCR_COUNT_POOL);
+        }
+    }
+    private void incrDownloadCount(Generator generator) {
+        generator.setDownloadCount(generator.getDownloadCount() + 1);
+        this.updateById(generator);
+    }
+
+    private void incrUseCount(Generator generator) {
+        generator.setUseCount(generator.getUseCount() + 1);
+        this.updateById(generator);
+    }
+
+
 }
 
 

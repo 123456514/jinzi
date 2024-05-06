@@ -3,10 +3,20 @@ package com.jinzi.maker.generator.file;
 import cn.hutool.core.io.FileUtil;
 
 /**
- * 静态文件生成器
+ * @author zhang
+ * @date 2023/11/9 18:07
  */
 public class StaticFileGenerator {
-    public static void copyFilesByHutool(String inputPath,String outputPath){
-        FileUtil.copy(inputPath,outputPath,false);
+
+    /**
+     * 复制文件
+     *
+     * @param inputPath  输入路径
+     * @param outputPath 输出路径
+     */
+    public static void copyFilesByHuTool(String inputPath, String outputPath) {
+        FileUtil.copy(inputPath, outputPath, false);
     }
+
+
 }

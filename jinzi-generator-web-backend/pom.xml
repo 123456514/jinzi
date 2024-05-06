@@ -154,6 +154,19 @@
             <artifactId>IJPay-AliPay</artifactId>
             <version>2.9.5</version>
         </dependency>
+        <!--    ai接口    -->
+        <dependency>
+            <groupId>com.yucongming</groupId>
+            <artifactId>yucongming-java-sdk</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+        <!--修改version为最新稳定版-->
+        <dependency>
+            <groupId>io.github.briqt</groupId>
+            <artifactId>xunfei-spark4j</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

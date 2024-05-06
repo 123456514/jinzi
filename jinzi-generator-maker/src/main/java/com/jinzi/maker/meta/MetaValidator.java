@@ -6,8 +6,8 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.jinzi.maker.meta.enums.FileGenerateTypeEnum;
 import com.jinzi.maker.meta.enums.FileTypeEnum;
+import com.jinzi.maker.meta.enums.ModelTypeEnum;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,17 +34,18 @@ public class MetaValidator {
             return;
         }
         for (Meta.ModelConfig.ModelInfo modelInfo : modelInfoList) {
-            //如果为group 不校验
+            // 为 group，不校验
             String groupKey = modelInfo.getGroupKey();
-            if(StrUtil.isNotEmpty(groupKey)){
+            if (StrUtil.isNotEmpty(groupKey)) {
                 // 生成中间参数
                 List<Meta.ModelConfig.ModelInfo> subModelInfoList = modelInfo.getModels();
-                String allArgsStr = subModelInfoList.stream()
-                        .map(subModelInfo -> String.format("\"--%s\"",subModelInfo.getFieldName()))
+                String allArgsStr = modelInfo.getModels().stream()
+                        .map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName()))
                         .collect(Collectors.joining(", "));
                 modelInfo.setAllArgsStr(allArgsStr);
                 continue;
             }
+
             // 输出路径默认值
             String fieldName = modelInfo.getFieldName();
             if (StrUtil.isBlank(fieldName)) {
@@ -53,14 +54,14 @@ public class MetaValidator {
 
             String modelInfoType = modelInfo.getType();
             if (StrUtil.isEmpty(modelInfoType)) {
-                modelInfo.setType("String");
+                modelInfo.setType(ModelTypeEnum.STRING.getValue());
             }
         }
     }
 
     public static void validAndFillFileConfig(Meta meta) {
         // fileConfig 默认值
-        Meta.FileConfig fileConfig = meta.getFileConfig();
+        Meta.FileConfigDTO fileConfig = meta.getFileConfig();
         if (fileConfig == null) {
             return;
         }
@@ -71,7 +72,7 @@ public class MetaValidator {
         }
         // inputRootPath：.source + sourceRootPath 的最后一个层级路径
         String inputRootPath = fileConfig.getInputRootPath();
-        String defaultInputRootPath = ".source" + File.separator + FileUtil.getLastPathEle(Paths.get(sourceRootPath)).getFileName().toString();
+        String defaultInputRootPath = ".source/" + FileUtil.getLastPathEle(Paths.get(sourceRootPath)).getFileName().toString();
         if (StrUtil.isEmpty(inputRootPath)) {
             fileConfig.setInputRootPath(defaultInputRootPath);
         }
@@ -88,15 +89,14 @@ public class MetaValidator {
         }
 
         // fileInfo 默认值
-        List<Meta.FileConfig.FileInfo> fileInfoList = fileConfig.getFiles();
+        List<Meta.FileConfigDTO.FileInfoDTO> fileInfoList = fileConfig.getFiles();
         if (!CollectionUtil.isNotEmpty(fileInfoList)) {
             return;
         }
-        for (Meta.FileConfig.FileInfo fileInfo : fileInfoList) {
-            // 由于新增了分组类别，当我呢间类别为group 时可以不填写文件输入输入路径信息
+        for (Meta.FileConfigDTO.FileInfoDTO fileInfo : fileInfoList) {
             String type = fileInfo.getType();
-            // 如果类型为 group 不校验
-            if(FileTypeEnum.GROUP.getValue().equals(type)){
+            // 类型为 group，不校验
+            if (FileTypeEnum.GROUP.getValue().equals(type)) {
                 continue;
             }
             // inputPath: 必填
@@ -136,8 +136,8 @@ public class MetaValidator {
         // 校验并填充默认值
         String name = StrUtil.blankToDefault(meta.getName(), "my-generator");
         String description = StrUtil.emptyToDefault(meta.getDescription(), "我的模板代码生成器");
-        String author = StrUtil.emptyToDefault(meta.getAuthor(), "zhoujin");
-        String basePackage = StrUtil.blankToDefault(meta.getBasePackage(), "com.jinzi");
+        String author = StrUtil.emptyToDefault(meta.getAuthor(), "azhang");
+        String basePackage = StrUtil.blankToDefault(meta.getBasePackage(), "com.azhang");
         String version = StrUtil.emptyToDefault(meta.getVersion(), "1.0");
         String createTime = StrUtil.emptyToDefault(meta.getCreateTime(), DateUtil.now());
         meta.setName(name);

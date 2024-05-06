@@ -12,22 +12,25 @@
     "type": "dir",
     "files": [
       {
-        "groupKey": "git",
-        "groupName": "开源",
-        "type": "group",
-        "condition": "needGit",
-        "files": [
+        "groupKey" : "mainTemplate",
+        "groupName" : "核心模板",
+        "type": "MainTemplate",
+        "description": "使用生成核心模板文件",
+        "condition": "loop",
+        "models": [
           {
-            "inputPath": ".gitignore",
-            "outputPath": ".gitignore",
-            "type": "file",
-            "generateType": "static"
+            "fieldName": "author",
+            "type": "String",
+            "description": "作者注释",
+            "defaultValue": "zhoujin",
+            "abbr": "a"
           },
           {
-            "inputPath": "README.md",
-            "outputPath": "README.md",
-            "type": "file",
-            "generateType": "static"
+            "fieldName": "outputText",
+            "type": "String",
+            "description": "输出信息",
+            "defaultValue": "sum = ",
+            "abbr": "o"
           }
         ]
       },
@@ -43,30 +46,30 @@
     "models": [
       {
         "fieldName": "needGit",
-        "type": "boolean",
+        "type": "Boolean",
         "description": "是否生成.gitignore文件",
         "defaultValue": true,
         "abbr": "n"
       },
       {
         "fieldName": "loop",
-        "type": "boolean",
+        "type": "Boolean",
         "description": "是否生成循环",
         "defaultValue": false,
         "abbr": "l"
       },
       {
-        "groupKey" : "mainTemplate",
-        "groupName" : "核心模板",
+        "groupKey": "mainTemplate",
+        "groupName": "核心模板",
         "type": "MainTemplate",
-        "description": "使用生成核心模板文件",
+        "description": "核心模板参数",
         "condition": "loop",
         "models": [
           {
             "fieldName": "author",
             "type": "String",
             "description": "作者注释",
-            "defaultValue": "zhoujin",
+            "defaultValue": "azhang",
             "abbr": "a"
           },
           {

@@ -1,8 +1,8 @@
 package com.jinzi.maker;
 
+import com.jinzi.maker.generator.MainGenerator;
 import com.jinzi.maker.generator.main.GenerateTemplate;
-import com.jinzi.maker.generator.main.MainGenerator;
-import com.jinzi.maker.generator.main.ZipGenerator;
+import com.jinzi.maker.generator.ZipGenerator;
 import freemarker.template.TemplateException;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
 
-        GenerateTemplate generateTemplate = new ZipGenerator();
-        generateTemplate.doGenerate();
+        GenerateTemplate generator = new MainGenerator();
+        generator.doGenerate();
     }
 }

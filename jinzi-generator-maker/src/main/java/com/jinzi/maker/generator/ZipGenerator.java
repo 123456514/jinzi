@@ -1,4 +1,6 @@
-package com.jinzi.maker.generator.main;
+package com.jinzi.maker.generator;
+
+import com.jinzi.maker.generator.main.GenerateTemplate;
 
 public class ZipGenerator extends GenerateTemplate {
 

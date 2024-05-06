@@ -12,6 +12,7 @@ export default [
   { path: '/list/page/vo', icon: 'home', component: './Index', name: "主页" },
   { path: '/recharge/list', icon: 'PayCircleOutlined', name: '积分商城', component: './Recharge' },
   { path: '/order/list', name: '我的订单', icon: 'ProfileOutlined', component: './Order/OrderList',},
+  { path: '/ai_question/assistant', name: '金子 AI助手', icon: 'barChart',component:'./AiChatAssistant/AddChat'},
   {
     path: '/generator/add',
     icon: 'plus',

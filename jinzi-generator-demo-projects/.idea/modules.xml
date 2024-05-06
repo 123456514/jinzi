@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/acm-template/acm-template.iml" filepath="$PROJECT_DIR$/acm-template/acm-template.iml" />
       <module fileurl="file://$PROJECT_DIR$/acm-template-pro/acm-template-pro.iml" filepath="$PROJECT_DIR$/acm-template-pro/acm-template-pro.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/jinzi-generator-demo-projects.iml" filepath="$PROJECT_DIR$/.idea/jinzi-generator-demo-projects.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springboot-init/springboot-init.iml" filepath="$PROJECT_DIR$/springboot-init/springboot-init.iml" />
     </modules>
   </component>
 </project>
