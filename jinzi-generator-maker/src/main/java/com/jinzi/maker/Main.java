@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
 
-        GenerateTemplate generator = new MainGenerator();
+        GenerateTemplate generator = new ZipGenerator();
         generator.doGenerate();
     }
 }

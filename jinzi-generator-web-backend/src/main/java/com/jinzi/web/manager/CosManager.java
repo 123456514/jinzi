@@ -56,8 +56,7 @@ public class CosManager {
      * @return 上传结果
      */
     public PutObjectResult putObject(String key, String localFilePath) {
-        PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key,
-                new File(localFilePath));
+        PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key, new File(localFilePath));
         return cosClient.putObject(putObjectRequest);
     }
 
@@ -69,8 +68,7 @@ public class CosManager {
      * @return 上传结果
      */
     public PutObjectResult putObject(String key, File file) {
-        PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key,
-                file);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key, file);
         return cosClient.putObject(putObjectRequest);
     }
 

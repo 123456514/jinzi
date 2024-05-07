@@ -2,12 +2,21 @@ package com.jinzi.web.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.jinzi.maker.generator.ZipGenerator;
+import com.jinzi.maker.generator.main.GenerateTemplate;
+import com.jinzi.maker.meta.Meta;
+import com.jinzi.maker.meta.MetaValidator;
 import com.jinzi.web.common.ErrorCode;
 import com.jinzi.web.constant.CommonConstant;
+import com.jinzi.web.constant.GeneratorConstant;
 import com.jinzi.web.exception.BusinessException;
 import com.jinzi.web.exception.ThrowUtils;
 import com.jinzi.web.manager.CosManager;
@@ -37,12 +46,17 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import static com.jinzi.web.manager.LocalFileCacheManager.getCacheFilePath;
 
 /**
  * 帖子服务实现
@@ -89,8 +103,11 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     );
 
 
-
-
+    /**
+     * 校验代码生成器
+     * @param Generator
+     * @param add
+     */
     @Override
     public void validGenerator(Generator Generator, boolean add) {
         if (Generator == null) {
@@ -153,6 +170,12 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         return queryWrapper;
     }
 
+    /**
+     * 得到返回给前端的代码生成器的 VO信息
+     * @param Generator
+     * @param request
+     * @return
+     */
     @Override
     public GeneratorVO getGeneratorVO(Generator Generator, HttpServletRequest request) {
         GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
@@ -185,6 +208,12 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         return generatorVO;
     }
 
+    /**
+     * 获取分页代码生成器
+     * @param generatorPage
+     * @param request
+     * @return
+     */
     @Override
     public Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request) {
         List<Generator> generatorList = generatorPage.getRecords();
@@ -232,6 +261,11 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
     }
+
+    /**
+     * 缓存代码生成器
+     * @param idList
+     */
     @Override
     public void cacheGenerators(List<Long> idList) {
         for (Long id : idList) {
@@ -264,6 +298,12 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             }
         }
     }
+
+    /**
+     * 得到 idList 中的所有代码生成器
+     * @param idList
+     * @return
+     */
     @Override
     public List<Generator> getBatchByIds(List<Long> idList) {
         if (CollUtil.isEmpty(idList)) {
@@ -273,9 +313,15 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
     }
 
 
+    /**
+     * 下载代码生成器
+     * @param generator
+     * @param response
+     * @throws IOException
+     */
     @Override
     public void downloadGenerator(Generator generator, HttpServletResponse response) throws IOException {
-        String filepath = generator.getDistPath();
+        String filepath = getTruePath(generator.getDistPath());
         Long id = generator.getId();
         // 设置响应头
         response.setContentType("application/octet-stream;charSet=UTF-8");
@@ -289,16 +335,6 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             Files.copy(Paths.get(zipFilePath), response.getOutputStream());
             return;
         }
-        int lastIndex = filepath.lastIndexOf('/');
-        int secondLastIndex = lastIndex != 0 ? filepath.lastIndexOf('/', lastIndex - 1) : -1;
-        int thirdLastIndex = secondLastIndex != 0 ? filepath.lastIndexOf('/', secondLastIndex - 1) : -1;
-        if (thirdLastIndex != -1) {
-            filepath= filepath.substring(thirdLastIndex);
-            System.out.println(filepath); // 输出类似: /path/to/file.txt
-        } else {
-            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
-        }
-
         // 从对象存储下载
         COSObjectInputStream cosObjectInput = null;
         try {
@@ -320,17 +356,355 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             CompletableFuture.runAsync(() ->incrDownloadCount(generator), INCR_COUNT_POOL);
         }
     }
+
+    /**
+     * 使用代码生成器
+     * @param path
+     * @param generatorId
+     * @param loginUserId
+     * @param dataModel
+     * @param response
+     */
+    @Override
+    public void useGenerator(String path,long generatorId,long loginUserId,Map<String, Object> dataModel,HttpServletResponse response) {
+        // 生成器的存储路径
+        String distPath = getTruePath(path);
+        if (StrUtil.isBlank(distPath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
+        }
+
+        // 从对象存储下载生成器的压缩包
+        // 定义独立的工作空间
+        String projectPath = System.getProperty("user.dir");
+        // 必须要用 userId 区分，否则可能会导致输入参数文件冲突
+        String tempDirPath = String.format("%s/.temp/use/%s/%s", projectPath, generatorId, loginUserId);
+        String zipFilePath = tempDirPath + "/dist.zip";
+
+        // 目录不存在则创建
+        if (!FileUtil.exist(tempDirPath)) {
+            FileUtil.mkdir(tempDirPath);
+        }
+
+        // 使用文件缓存
+        String cacheFilePath = getCacheFilePath(generatorId, distPath);
+        Path cacheFilePathObj = Paths.get(cacheFilePath);
+        Path zipFilePathObj = Paths.get(zipFilePath);
+        if (!FileUtil.exist(zipFilePath)) {
+            // 有缓存，复制文件
+            if (FileUtil.exist(cacheFilePath)) {
+                try {
+                    Files.copy(cacheFilePathObj, zipFilePathObj);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                // 没有缓存，从对象存储下载文件
+                FileUtil.touch(zipFilePath);
+                try {
+                    cosManager.download(distPath, zipFilePath);
+                } catch (Exception e) {
+                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+                }
+                // 写文件缓存
+                File parentFile = cacheFilePathObj.toFile().getParentFile();
+                if (!FileUtil.exist(parentFile)) {
+                    FileUtil.mkdir(parentFile);
+                }
+                try {
+                    Files.copy(zipFilePathObj, cacheFilePathObj);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        // 解压压缩包，得到脚本文件
+        File unzipDistDir = ZipUtil.unzip(zipFilePath);
+
+        // 将用户输入的参数写到 json 文件中
+        String dataModelFilePath = tempDirPath + "/dataModel.json";
+        String jsonStr = JSONUtil.toJsonStr(dataModel);
+        FileUtil.writeUtf8String(jsonStr, dataModelFilePath);
+
+        // 执行脚本
+        // 找到脚本文件所在路径
+        // 要注意，如果不是 windows 系统，找 generator 文件而不是 bat
+        // 依次遍历整个文件目录
+        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
+                .stream()
+                .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
+                .findFirst()
+                .orElseThrow(RuntimeException::new);
+        // 添加可执行权限
+        try {
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
+            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
+        } catch (Exception e) {
+
+        }
+
+        // 构造命令
+        File scriptDir = scriptFile.getParentFile();
+        // win 系统
+        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+
+        // 注意，如果是 mac / linux 系统，要用 "./generator"
+//        String scriptAbsolutePath = scriptFile.getAbsolutePath();
+//        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+
+        // 这里一定要拆分！
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+        processBuilder.directory(scriptDir);
+
+        try {
+            Process process = processBuilder.start();
+            // 读取命令的输出
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+            // 等待命令执行完成
+            int exitCode = process.waitFor();
+            System.out.println("命令执行结束，退出码：" + exitCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本错误");
+        }
+
+        // 压缩得到的生成结果，返回给前端
+        String generatedPath = scriptDir.getAbsolutePath() + "/generated";
+        String resultPath = tempDirPath + "/result.zip";
+        File resultFile = ZipUtil.zip(generatedPath, resultPath);
+
+        // 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + resultFile.getName());
+        try {
+            Files.copy(resultFile.toPath(), response.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // 清理文件
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
+    }
+
+
+    @Override
+    public void onlineUseGenerator(Generator generator, Object dataModel, Long userId, HttpServletResponse response) throws IOException {
+        String distPath = getTruePath(generator.getDistPath());
+        Long id = generator.getId();
+
+        // 定义独立的工作空间，用户单独的工作空间
+        String projectPath = System.getProperty("user.dir");
+        String tmpDirPath = String.format("%s/.tmp/use/%s/%s", projectPath, userId, id);
+        String zipFilePath = tmpDirPath + "/dist.zip";
+
+        if (!FileUtil.exist(zipFilePath)) {
+            FileUtil.touch(zipFilePath);
+        }
+
+        String cacheFilePath = LocalFileCacheManager.getCacheFilePath(id, distPath);
+        boolean isCached = LocalFileCacheManager.isCached(cacheFilePath);
+        // 判断当前要执行的生成器是否在缓存中
+        if (isCached) {
+            // 复制
+            FileUtil.copy(cacheFilePath, zipFilePath, true);
+        } else {
+            // 从对象存储中下载生成器压缩包
+            try {
+                cosManager.download(distPath, zipFilePath);
+            } catch (InterruptedException e) {
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
+            }
+        }
+
+        // 解压压缩包，得到脚本文件
+        File unzipDistDir = ZipUtil.unzip(zipFilePath);
+
+        // 将用户输入的参数写入到 json 文件中
+        String dataModelFilePath = tmpDirPath + "/dataModel.json";
+        String dataModelJsonStr = JSONUtil.toJsonStr(dataModel);
+        FileUtil.writeUtf8String(dataModelJsonStr, dataModelFilePath);
+
+        // 执行脚本
+        // 查找脚本路径，注意区分系统
+        String os = System.getProperty("os.name");
+
+        boolean isWin = os.toLowerCase().contains("windows");
+        String scriptFileName = isWin ? "generator.bat" : "generator";
+        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
+                .stream()
+                .filter(file -> file.isFile() && scriptFileName.equals(file.getName()))
+                .findFirst()
+                .orElseThrow(
+                        () -> new BusinessException(ErrorCode.NOT_FOUND_ERROR,
+                                "脚本文件 " + scriptFileName + "不存在"));
+
+        // 添加执行权限
+        try {
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
+            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
+        } catch (Exception e) {
+        }
+
+        // 构造命令
+        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        String[] commands = {scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
+
+        // 执行命令
+        File scriptDir = scriptFile.getParentFile();
+        ProcessBuilder processBuilder = new ProcessBuilder(commands);
+        processBuilder.directory(scriptDir);
+
+        try {
+            Process process = processBuilder.start();
+
+            // 读取命令的输出
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                log.info(line);
+            }
+            int exitCode = process.waitFor();
+            log.info("execute script finished! exit code = {}", exitCode);
+        } catch (Exception e) {
+            log.error("execute script error, ", e);
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "脚本执行失败");
+        }
+
+        // 压缩得到生成的结果，写入给前端
+        String generatedPath = scriptDir.getAbsolutePath() + "/generated";
+        String resultPath = tmpDirPath + "/result.zip";
+        File resultFile = ZipUtil.zip(generatedPath, resultPath);
+
+        // 设置响应头
+        response.setContentType("application/octet-stream;charSet=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + resultFile.getName());
+        Files.copy(resultFile.toPath(), response.getOutputStream());
+
+        // 清理文件
+        CompletableFuture.runAsync(() -> FileUtil.del(tmpDirPath), CLEAN_UP_POOL);
+        // 使用次数和阈值判断，以及更新本地文件缓存
+        CompletableFuture.runAsync(() -> {
+            Integer useCount = generator.getUseCount();
+            if (useCount >= GeneratorConstant.HOT_GENERATOR_USE_COUNT_THRESHOLD - 1) {
+                log.info("cache generator, id = {}", generator.getId());
+                this.cacheGenerators(Collections.singletonList(id));
+            }
+            // 更新使用次数
+            incrUseCount(generator);
+            // 更新缓存
+            if (isCached) {
+                LocalFileCacheManager.updateCacheExpiration(cacheFilePath);
+            }
+        }, INCR_COUNT_POOL);
+    }
+
+    /**
+     * 制作代码生成器
+     * @param zipFilePath
+     * @param meta
+     * @param response
+     */
+    @Override
+    public void makeGenerator(String zipFilePath, Meta meta, HttpServletResponse response) {
+        // 工作空间
+        String projectPath = System.getProperty("user.dir");
+        // 随机 id
+        String id = IdUtil.getSnowflakeNextId() + RandomUtil.randomString(6);
+        String tempDirPath = String.format("%s/.temp/make/%s", projectPath, id);
+        String localZipFilePath = tempDirPath + "/project.zip";
+
+        // 新建文件
+        if (!FileUtil.exist(localZipFilePath)) {
+            FileUtil.touch(localZipFilePath);
+        }
+
+        try {
+            cosManager.download(zipFilePath, localZipFilePath);
+        } catch (InterruptedException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "压缩包下载失败");
+        }
+
+        // 3）解压，得到项目模板文件
+        File unzipDistDir = ZipUtil.unzip(localZipFilePath);
+
+        // 4）构造 meta 对象和输出路径
+        String sourceRootPath = unzipDistDir.getAbsolutePath();
+        meta.getFileConfig().setSourceRootPath(sourceRootPath);
+        MetaValidator.doValidAndFill(meta);
+        String outputPath = String.format("%s/generated/%s", tempDirPath, meta.getName());
+
+        // 5）调用 maker 方法制作生成器
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        try {
+            generateTemplate.doGenerate(meta, outputPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "制作失败");
+        }
+
+        // 6）下载压缩的产物包文件
+        String suffix = "-dist.zip";
+        String zipFileName = meta.getName() + suffix;
+        String distZipFilePath = outputPath + suffix;
+
+        // 下载文件
+        // 设置响应头
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + zipFileName);
+        // 写入响应
+        try {
+            Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 7）清理文件
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
+    }
+
+    /**
+     * 增加下载次数
+     * @param generator
+     */
     private void incrDownloadCount(Generator generator) {
         generator.setDownloadCount(generator.getDownloadCount() + 1);
         this.updateById(generator);
     }
 
+    /**
+     * 增加使用次数
+     * @param generator
+     */
     private void incrUseCount(Generator generator) {
         generator.setUseCount(generator.getUseCount() + 1);
         this.updateById(generator);
     }
 
 
+    /**
+     * 得到 产物包的相对路径
+     */
+    private String getTruePath(String filePath){
+        int lastIndex = filePath.lastIndexOf('/');
+        int secondLastIndex = lastIndex != 0 ? filePath.lastIndexOf('/', lastIndex - 1) : -1;
+        int thirdLastIndex = secondLastIndex != 0 ? filePath.lastIndexOf('/', secondLastIndex - 1) : -1;
+        if (thirdLastIndex != -1) {
+            filePath= filePath.substring(thirdLastIndex);
+            System.out.println(filePath); // 输出类似: /path/to/file.txt
+        } else {
+            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
+        }
+        return filePath;
+    }
 }
 
 

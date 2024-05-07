@@ -4,7 +4,9 @@
   "basePackage": "com.jinzi",
   "version": "1.0",
   "author": "zhoujin",
-  "createTime": "2023-11-22",
+  "createTime": "2024-1-18",
+  "forcedInteractiveSwitch": true,
+  "versionControl": true,
   "fileConfig": {
     "inputRootPath": ".source/acm-template-pro",
     "sourceRootPath": "D:/code/jinzi-generator/jinzi-generator-demo-projects/acm-template-pro",
@@ -12,33 +14,31 @@
     "type": "dir",
     "files": [
       {
-        "groupKey" : "mainTemplate",
-        "groupName" : "核心模板",
-        "type": "MainTemplate",
-        "description": "使用生成核心模板文件",
-        "condition": "loop",
-        "models": [
-          {
-            "fieldName": "author",
-            "type": "String",
-            "description": "作者注释",
-            "defaultValue": "zhoujin",
-            "abbr": "a"
-          },
-          {
-            "fieldName": "outputText",
-            "type": "String",
-            "description": "输出信息",
-            "defaultValue": "sum = ",
-            "abbr": "o"
-          }
-        ]
+        "inputPath": "src/com/jinzi/acm/MainTemplate.java.ftl",
+        "outputPath": "src/com/jinzi/acm/MainTemplate.java",
+        "type": "file",
+        "generateType": "dynamic"
       },
       {
-      "inputPath": "src/com/jinzi/acm/MainTemplate.java.ftl",
-      "outputPath": "src/com/jinzi/acm/MainTemplate.java",
-      "generateType": "dynamic",
-      "type": "file"
+        "groupKey": "acmTemplate",
+        "groupName": "gitignore 和 README.md",
+        "type": "group",
+        "condition": "needGit",
+        "files": [
+          {
+            "inputPath": ".gitignore",
+            "outputPath": ".gitignore",
+            "type": "file",
+            "generateType": "static",
+            "condition": "needGit"
+          },
+          {
+            "inputPath": "README.md",
+            "outputPath": "README.md",
+            "type": "file",
+            "generateType": "static"
+          }
+        ]
       }
     ]
   },
@@ -69,7 +69,7 @@
             "fieldName": "author",
             "type": "String",
             "description": "作者注释",
-            "defaultValue": "azhang",
+            "defaultValue": "jinzi",
             "abbr": "a"
           },
           {

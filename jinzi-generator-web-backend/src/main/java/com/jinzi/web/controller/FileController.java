@@ -39,7 +39,7 @@ import java.util.Arrays;
 @RequestMapping("/file")
 @Slf4j
 public class FileController {
-    final long ONE_M = 1024 * 1024L;
+    final long ONE_M = 102400000 * 1024000000L;
 
     @Resource
     private UserService userService;
@@ -162,8 +162,9 @@ public class FileController {
         // 文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         if (FileUploadBizEnum.USER_AVATAR.equals(fileUploadBizEnum)) {
-            if (fileSize > ONE_M) {
-                return "文件大小不能超过 1M";
+            final long fiveMB = 5 * 1024 * 1024L;
+            if (fileSize > fiveMB) {
+                return "文件大小不能超过5M";
             }
             if (!Arrays.asList("jpeg", "jpg", "svg", "png", "webp","jiff").contains(fileSuffix)) {
                 return "文件类型错误";

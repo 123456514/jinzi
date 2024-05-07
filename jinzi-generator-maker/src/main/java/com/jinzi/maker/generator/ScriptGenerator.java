@@ -34,8 +34,8 @@ public class ScriptGenerator {
         }
     }
 
-//    public static void main(String[] args) {
-//        doGenerate("D:\\Program Files\\code\\me\\zhangPro\\azhang-generator\\azhang-generator-maker\\generated\\acm-template-pro-generator\\target\\generator", "");
-//    }
+    public static void main(String[] args) {
+        doGenerate("D:\\Program Files\\code\\me\\zhangPro\\azhang-generator\\azhang-generator-maker\\generated\\acm-template-pro-generator\\target\\generator", "");
+    }
 
 }

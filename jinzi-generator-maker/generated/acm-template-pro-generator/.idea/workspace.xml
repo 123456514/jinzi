@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d0fcebd8-7f79-4cd5-a339-01e0236ea141" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../../../jinzi-generator-demo-projects/acm-template-pro/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../jinzi-generator-demo-projects/acm-template-pro/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../jinzi-generator-demo-projects/acm-template-pro/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../../jinzi-generator-demo-projects/acm-template-pro/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/.source/acm-template-pro/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/.source/acm-template-pro/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/.source/acm-template-pro/acm-template-pro.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/.source/acm-template-pro/src/com/jinzi/acm/MainTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/.source/acm-template-pro/src/com/jinzi/acm/MainTemplate.java.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/generator" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../acm-template-pro-generator-dist/generator.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.source/acm-template-pro/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.source/acm-template-pro/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.source/acm-template-pro/acm-template-pro.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.source/acm-template-pro/src/com/jinzi/acm/MainTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.source/acm-template-pro/src/com/jinzi/acm/MainTemplate.java.ftl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generated/src/com/jinzi/acm/MainTemplate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/cli/CommandExecutor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/cli/command/ConfigCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/cli/command/GenerateCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/cli/command/ListCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/generator/DynamicGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/generator/MainGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/generator/StaticGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/jinzi/model/DataModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/doc/swagger.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/sql/create_table.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/sql/post_es_mapping.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/MainApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/annotation/AuthCheck.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/aop/AuthInterceptor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/aop/LogInterceptor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/common/BaseResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/common/DeleteRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/common/ErrorCode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/common/PageRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/common/ResultUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/config/CosClientConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/config/JsonConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/config/MyBatisPlusConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/config/WxOpenConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/constant/CommonConstant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/constant/FileConstant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/constant/UserConstant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/FileController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/PostController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/PostFavourController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/PostThumbController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/controller/WxMpController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/esdao/PostEsDao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/exception/BusinessException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/exception/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/exception/ThrowUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/job/cycle/IncSyncPostToEs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/job/once/FullSyncPostToEs.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/manager/CosManager.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/mapper/PostFavourMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/mapper/PostMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/mapper/PostThumbMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/mapper/UserMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/file/UploadFileRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/post/PostAddRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/post/PostEditRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/post/PostEsDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/post/PostQueryRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/post/PostUpdateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/postfavour/PostFavourAddRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/postfavour/PostFavourQueryRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/postthumb/PostThumbAddRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserAddRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserLoginRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserQueryRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserRegisterRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserUpdateMyRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/dto/user/UserUpdateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/entity/Post.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/entity/PostFavour.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/entity/PostThumb.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/entity/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/enums/FileUploadBizEnum.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/enums/UserRoleEnum.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/vo/LoginUserVO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/vo/PostVO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/model/vo/UserVO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/PostFavourService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/PostService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/PostThumbService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/impl/PostFavourServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/impl/PostServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/impl/PostThumbServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/service/impl/UserServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/utils/NetUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/utils/SpringContextUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/utils/SqlUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/wxmp/WxMpConstant.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/wxmp/WxMpMsgRouter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/wxmp/handler/EventHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/wxmp/handler/MessageHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/java/com/yupi/springbootinit/wxmp/handler/SubscribeHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/META-INF/additional-spring-configuration-metadata.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/application-prod.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/application-test.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/mapper/PostFavourMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/mapper/PostMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/mapper/PostThumbMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/mapper/UserMapper.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/main/resources/test_excel.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/MainApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/esdao/PostEsDaoTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/manager/CosManagerTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/mapper/PostFavourMapperTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/mapper/PostMapperTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/service/PostFavourServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/service/PostServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/service/PostThumbServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/service/UserServiceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/.source/springboot-init/src/test/java/com/yupi/springbootinit/utils/EasyExcelTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/generator" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/generator.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/CommandExecutor.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/command/ConfigCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/command/GenerateCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/command/JsonGenerateCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/command/ListCommand.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/util/ConsoleUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/util/ConvertUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/cli/util/ReflexUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/generator/DynamicGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/generator/MainGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/generator/StaticGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../springboot-init-generator/src/main/java/com/azhang/model/DataModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/ScriptGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/ScriptGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/ZipGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/ZipGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/main/GenerateTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/generator/main/GenerateTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/meta/MetaManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/java/com/jinzi/maker/meta/MetaManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/resources/meta.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/resources/meta.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/main/resources/templates/java/cli/command/JsonGenerateCommand.java.ftl" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/main/resources/templates/java/cli/command/JsonGenerateCommand.java.ftl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/controller/FileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/controller/GeneratorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/controller/GeneratorController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/manager/CosManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/manager/CosManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/service/GeneratorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/service/GeneratorService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/service/impl/GeneratorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/java/com/jinzi/web/service/impl/GeneratorServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../jinzi-generator-web-backend/src/main/resources/application.yml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2g5gRpdTHUlrTNj4DVaIWDwfOCR" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.jinzi.cli.command" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.jinzi.Main" />
+      <module name="acm-template-pro-generator" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.jinzi.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-1.8.0_402-corretto-1.8.0_402-4caba194b151-ae57be32" />
+        <option value="jdk-17.0.10-corretto-17.0.10-4caba194b151-5cd809f4" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d0fcebd8-7f79-4cd5-a339-01e0236ea141" name="Changes" comment="" />
+      <created>1714992846665</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1714992846665</updated>
+      <workItem from="1714992847726" duration="2789000" />
+      <workItem from="1715004759185" duration="1196000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

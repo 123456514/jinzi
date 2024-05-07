@@ -23,12 +23,7 @@ public class JsonGenerateCommand implements Runnable {
     /**
      * json文件路径
      */
-    @CommandLine.Option(
-            names = {"-f", "--file"},
-            arity = "0..1",
-            description = "json文件路径",
-            echo = true,
-            interactive = true)
+    @CommandLine.Option(names = {"-f", "--file"},arity = "0..1",description = "json文件路径",echo = true,interactive = true)
     private String filePath;
 
 

@@ -89,7 +89,7 @@ public abstract class GenerateTemplate {
         String inputResourcePath = "";
         if (meta.getVersionControl()) {
             VersionControlGenerator.doGenerate(outputPath);
-            String inputFilePath = inputResourcePath + File.separator + "templates/static/.gitignore";
+            String inputFilePath = inputResourcePath + "/" + "templates/static/.gitignore";
             FileUtil.copy(inputFilePath, outputPath, true);
         }
     }
