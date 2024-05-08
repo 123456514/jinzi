@@ -284,33 +284,27 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     public String doPaymentNotify(String notifyData, HttpServletRequest request) {
         Map<String, String> params = AliPayApi.toMap(request);
         AliPayAsyncResponse aliPayAsyncResponse = JSONUtil.toBean(JSONUtil.toJsonStr(params), AliPayAsyncResponse.class);
-        String lockName = "notify:AlipayOrder:lock:" + aliPayAsyncResponse.getOutTradeNo();
-        return redissonLockUtil.redissonDistributedLocks(lockName, "【支付宝异步回调异常】:", () -> {
-            String result;
-            try {
-                result = checkAlipayOrder(aliPayAsyncResponse, params);
-            } catch (AlipayApiException e) {
-                throw new BusinessException(ErrorCode.OPERATION_ERROR, e.getMessage());
-            }
-            if (!"success".equals(result)) {
-                return result;
-            }
-            String doAliPayOrderBusinessResult = this.doAliPayOrderBusiness(aliPayAsyncResponse);
-            if (StringUtils.isBlank(doAliPayOrderBusinessResult)) {
-                throw new BusinessException(ErrorCode.OPERATION_ERROR);
-            }
-            return doAliPayOrderBusinessResult;
-        });
+
+
+        String result;
+        try {
+            result = checkAlipayOrder(aliPayAsyncResponse, params);
+        } catch (AlipayApiException e) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, e.getMessage());
+        }
+        if (!"success".equals(result)) {
+            return result;
+        }
+        String doAliPayOrderBusinessResult = this.doAliPayOrderBusiness(aliPayAsyncResponse);
+        if (StringUtils.isBlank(doAliPayOrderBusinessResult)) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
+        return doAliPayOrderBusinessResult;
     }
 
     private String checkAlipayOrder(AliPayAsyncResponse response, Map<String, String> params) throws AlipayApiException {
         String result = "failure";
-        boolean verifyResult = AlipaySignature.rsaCheckV1(params, AliPayApiConfigKit.getAliPayApiConfig().getAliPayPublicKey(),
-                AliPayApiConfigKit.getAliPayApiConfig().getCharset(),
-                AliPayApiConfigKit.getAliPayApiConfig().getSignType());
-        if (!verifyResult) {
-            return result;
-        }
+
         // 1.验证该通知数据中的 out_trade_no 是否为商家系统中创建的订单号。
         ProductOrder productOrder = this.getProductOrderByOutTradeNo(response.getOutTradeNo());
         if (productOrder == null) {

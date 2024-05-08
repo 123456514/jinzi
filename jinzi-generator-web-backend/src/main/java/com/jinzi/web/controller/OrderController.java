@@ -115,7 +115,6 @@ public class OrderController {
      *
      * @param productOrderQueryRequest 接口信息查询请求
      * @param request                  请求
-     * @return {@link BaseResponse}<{@link Page}<{@link com.qimu.qiapibackend.model.entity.ProductOrder}>>
      */
     @GetMapping("/list/page")
     public BaseResponse<OrderVo> listProductOrderByPage(ProductOrderQueryRequest productOrderQueryRequest, HttpServletRequest request) {
@@ -222,6 +221,9 @@ public class OrderController {
 
     @PostMapping("/notify/order")
     public String parseOrderNotifyResult(@RequestBody String notifyData, HttpServletRequest request) {
+        final String s = orderService.doOrderNotify(notifyData, request);
+
+
         return orderService.doOrderNotify(notifyData, request);
     }
 

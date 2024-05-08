@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 import static com.jinzi.web.constant.UserConstant.ADMIN_ROLE;
 
 /**
- * 帖子接口
  *
+ * 商品 产品控制
  */
 @RestController
 @RequestMapping("/productInfo")

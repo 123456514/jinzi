@@ -18,9 +18,7 @@ import com.jinzi.web.utils.RedissonLockUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +29,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static com.jinzi.web.model.enums.PayTypeStatusEnum.ALIPAY;
-import static com.jinzi.web.model.enums.PayTypeStatusEnum.WX;
+
 
 
 
@@ -67,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
                     Qualifier qualifierAnnotation = s.getClass().getAnnotation(Qualifier.class);
                     return qualifierAnnotation != null && qualifierAnnotation.value().equals(payType);
                 })
+
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(ErrorCode.PARAMS_ERROR, "暂无该支付方式"));
     }
@@ -76,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
     public ProductOrderVo createOrderByPayType(Long productId, String payType, User loginUser) {
         // 按付费类型获取产品订单服务Bean
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userVO,loginUser);
+        BeanUtils.copyProperties(loginUser,userVO);
         ProductOrderService productOrderService = getProductOrderServiceByPayType(payType);
         String redissonLock = ("getOrder_" + userVO.getUserAccount()).intern();
 
@@ -87,14 +86,11 @@ public class OrderServiceImpl implements OrderService {
         if (getProductOrderVo != null) {
             return getProductOrderVo;
         }
-        redissonLock = ("createOrder_" + userVO.getUserAccount()).intern();
-        // 分布式锁工具
-        return redissonLockUtil.redissonDistributedLocks(redissonLock, () -> {
+
             // 检查是否购买充值活动
             checkBuyRechargeActivity(userVO.getId(), productId);
             // 保存订单,返回vo信息
             return productOrderService.saveProductOrder(productId, userVO);
-        });
     }
 
     /**
@@ -157,13 +153,9 @@ public class OrderServiceImpl implements OrderService {
      * @return {@link String}
      */
     @Override
+
     public String doOrderNotify(String notifyData, HttpServletRequest request) {
-        String payType;
-        if (notifyData.startsWith("gmt_create=") && notifyData.contains("gmt_create") && notifyData.contains("sign_type") && notifyData.contains("notify_type")) {
-            payType = ALIPAY.getValue();
-        } else {
-            payType = WX.getValue();
-        }
+        String payType = ALIPAY.getValue();
         return this.getProductOrderServiceByPayType(payType).doPaymentNotify(notifyData, request);
     }
 }

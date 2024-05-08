@@ -1,9 +1,6 @@
-import {Card, message, QRCode, Radio, Spin, Tooltip} from 'antd';
+import {Card, message,Radio, Spin, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {history} from '@umijs/max';
-
-import wechat from "../../../assets/WeChat.png";
-import WxPay from "@/components/Icon/WxPay";
 import ProCard from "@ant-design/pro-card";
 import Alipay from "@/components/Icon/Alipay";
 import {valueLength} from "@/pages/User/UserInfo";
@@ -17,14 +14,16 @@ import {
 const PayOrder: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [order, setOrder] = useState<API.ProductOrderVo>();
-  const [total, setTotal] = useState<any>("0.00");
+  const [, setTotal] = useState<any>("0.00");
   const [status, setStatus] = useState<string>('active');
   const [payType, setPayType] = useState<string>();
   const urlParams = new URL(window.location.href).searchParams;
   const codeUrl = urlParams.get("codeUrl")
   const urlPayType = urlParams.get("payType")
-  const [qrCode, setQrCode] = useState<any>('暂未选择支付方式');
+  const [, setQrCode] = useState<any>('暂未选择支付方式');
   const params = useParams()
+
+  // 创建订单
   const createOrder = async () => {
     setLoading(true)
     setStatus("loading")
@@ -36,12 +35,15 @@ const PayOrder: React.FC = () => {
       setTotal((res.data.total) / 100)
       setStatus("active")
       setLoading(false)
-      setQrCode(res.data.codeUrl)
+      // setQrCode(res.data.codeUrl)
     }
     if (res.code === 50001) {
       history.back()
     }
   }
+
+
+
   const queryOrderStatus = async () => {
     const currentTime = new Date();
     const expirationTime = new Date(order?.expirationTime as any);
@@ -60,6 +62,7 @@ const PayOrder: React.FC = () => {
     const res = await createOrderUsingPOST({productId: params.id, payType: "ALIPAY"})
     if (res.code === 0 && res.data) {
       message.loading("正在前往收银台,请稍后....")
+      // window.open("http://localhost:8120/alipay/pay?productId=" + params.id)
       setTimeout(() => {
         document.write(res?.data?.formData as string);
         setLoading(false)
@@ -86,7 +89,6 @@ const PayOrder: React.FC = () => {
       setTotal((res.data.total))
       setStatus("active")
       setLoading(false)
-      setQrCode(res.data.codeUrl)
     }
   }
   useEffect(() => {
@@ -99,9 +101,6 @@ const PayOrder: React.FC = () => {
   useEffect(() => {
     if (payType === "ALIPAY") {
       toAlipay()
-    }
-    if (payType === "WX" && !codeUrl) {
-      createOrder()
     }
   }, [payType])
 
@@ -137,20 +136,12 @@ const PayOrder: React.FC = () => {
       message.error('参数不存在');
       return;
     }
-    // 判断是否为手机设备
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     if (codeUrl) {
-      if (isMobile) {
-        window.location.href = codeUrl
-        return;
-      }
       setQrCode(codeUrl)
       setStatus("active")
-      setPayType("WX")
       return;
     }
     if (!urlPayType && !payType) {
-      setPayType("WX")
       setStatus("loading")
       return
     }
@@ -160,6 +151,10 @@ const PayOrder: React.FC = () => {
     }
     createOrder()
   }, [])
+
+
+
+
   return (
     <>
       <Card style={{minWidth: 385}}>
@@ -179,30 +174,6 @@ const PayOrder: React.FC = () => {
           >
             <Radio.Group name="payType" value={payType}>
               <ProCard wrap gutter={18}>
-                <ProCard
-                  onClick={() => {
-                    changePayType("WX")
-                  }}
-                  hoverable
-                  style={{
-                    border: payType === "WX" ? '1px solid #1890ff' : '1px solid rgba(128, 128, 128, 0.5)',
-                    maxWidth: 260,
-                    minWidth: 210,
-                    margin: 10,
-                  }}
-                  colSpan={
-                    {
-                      xs: 24,
-                      sm: 12,
-                      md: 12,
-                      lg: 12,
-                      xl: 12
-                    }
-                  }>
-                  <Radio value={"WX"} style={{fontSize: "1.12rem"}}>
-                    <WxPay/> 微信支付
-                  </Radio>
-                </ProCard>
                 <ProCard
                   onClick={() => {
                     changePayType("ALIPAY")
@@ -232,48 +203,6 @@ const PayOrder: React.FC = () => {
             </Radio.Group>
           </ProCard>
           <br/>
-          <Card title={"支付二维码"}>
-            <br/>
-            <ProCard
-              style={{marginTop: -30}}
-              layout={"center"}>
-              <QRCode
-                errorLevel="H"
-                size={240}
-                value={qrCode}
-                // @ts-ignore
-                status={status}
-                onRefresh={() => {
-                  if (!payType) {
-                    message.error("请先选择支付方式")
-                    return
-                  }
-                  createOrder()
-                }}
-              />
-            </ProCard>
-            <ProCard style={{
-              marginTop: -30,
-              color: "#f55f4e",
-              fontSize: 22,
-              display: 'flex',
-              fontWeight: "bold",
-            }} layout={"center"}>
-              ￥{total}
-            </ProCard>
-            <ProCard style={{marginTop: -20}} layout={"center"}>
-              <span>本商品为虚拟内容，购买后不支持<strong
-                style={{color: "red"}}>退换</strong>。确认支付表示您已阅读并接受<a
-                target={"_blank"}
-                href={"https://gitee.com/qimu6/statement/blob/master/%E6%9F%92%E6%9C%A8%E6%8E%A5%E5%8F%A3%E7%94%A8%E6%88%B7%E5%8D%8F%E8%AE%AE.md#%E6%9F%92%E6%9C%A8%E6%8E%A5%E5%8F%A3%E7%94%A8%E6%88%B7%E5%8D%8F%E8%AE%AE"}
-                rel="noreferrer"> 用户协议 </a>
-          如付款成功后10分钟后未到账，请联系站长微信：
-             <Tooltip placement="bottom" title={<img src={wechat} alt="微信 code_nav" width="120"/>}>
-               <a>aqimu66</a>
-             </Tooltip>
-            </span>
-            </ProCard>
-          </Card>
         </Spin>
       </Card>
     </>
