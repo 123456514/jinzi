@@ -71,16 +71,10 @@ export default () => {
         message.error("订单获取失败")
         return
       }
-      // 判断是否为手机设备
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      if (isMobile) {
-        window.location.href = record.codeUrl
-      } else {
         message.loading("正在前往收银台,请稍后.....", 0.6)
         setTimeout(() => {
           history.push(`/order/pay/${record.id}?codeUrl=${record?.codeUrl?.trim()}&payType=${record?.payType?.trim()}`)
         }, 800)
-      }
     } else {
       message.loading("正在前往收银台,请稍后....")
       setTimeout(() => {
@@ -88,7 +82,9 @@ export default () => {
           message.error("订单获取失败")
           return
         }
+        alert("qqqqqqqqqq")
         document.write(record.formData);
+        console.log(record.formData);
         setLoading(false)
       }, 2000)
     }

@@ -83,8 +83,6 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
     @Resource
     private PaymentInfoService paymentInfoService;
     @Resource
-    private RedissonLockUtil redissonLockUtil;
-    @Resource
     private RechargeActivityService rechargeActivityService;
 
     @Override
@@ -304,7 +302,6 @@ public class AlipayOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Prod
 
     private String checkAlipayOrder(AliPayAsyncResponse response, Map<String, String> params) throws AlipayApiException {
         String result = "failure";
-
         // 1.验证该通知数据中的 out_trade_no 是否为商家系统中创建的订单号。
         ProductOrder productOrder = this.getProductOrderByOutTradeNo(response.getOutTradeNo());
         if (productOrder == null) {
