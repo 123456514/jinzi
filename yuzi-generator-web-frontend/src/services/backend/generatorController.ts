@@ -181,3 +181,19 @@ export async function useGeneratorUsingPost(
     ...(options || {}),
   });
 }
+
+/** listGeneratorVOByPageSimplifyData POST /api/generator/list/page/vo/v2 */
+export async function listGeneratorVoByPageSimplifyDataUsingPost(
+  body: API.GeneratorQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageGeneratorVO_>('/api/generator/list/page/vo/v2', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+

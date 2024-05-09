@@ -1,5 +1,5 @@
 import {
-  listGeneratorVoByPageUsingPost
+  listGeneratorVoByPageSimplifyDataUsingPost, listGeneratorVoByPageUsingPost,
 } from '@/services/backend/generatorController';
 import {
   DownOutlined, LikeFilled,
@@ -37,9 +37,11 @@ const IndexPage: React.FC = () => {
   });
 
   const doSearch = async () => {
+
     setLoading(true);
     try {
-      const res = await listGeneratorVoByPageUsingPost(searchParams);
+      // const res = await listGeneratorVoByPageUsingPost(searchParams);
+      const res = await listGeneratorVoByPageSimplifyDataUsingPost(searchParams);
       setDataList(res.data?.records ?? []);
       setTotal(res.data?.total ?? 0);
     } catch (error: any) {
