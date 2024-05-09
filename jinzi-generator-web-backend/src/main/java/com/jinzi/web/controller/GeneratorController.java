@@ -52,11 +52,10 @@ public class GeneratorController {
     @Resource
     private UserService userService;
 
+
     @Resource
     private CacheManager cacheManager;
 
-    @Resource
-    private CosManager cosManager;
     private static final RateLimiter USE_LIMITER = RateLimiter.create(10);
     private static final RateLimiter MAKE_LIMITER = RateLimiter.create(10);
 
@@ -73,6 +72,11 @@ public class GeneratorController {
     public BaseResponse<Long> addGenerator(@RequestBody GeneratorAddRequest generatorAddRequest, HttpServletRequest request) {
         if (generatorAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        boolean isFull = userService.reduceWalletBalance(loginUser.getId(), 10);
+        if(!isFull){
+            return ResultUtils.error(ErrorCode.NO_FULL);
         }
         String name = generatorAddRequest.getName();
         String description = generatorAddRequest.getDescription();
@@ -101,7 +105,7 @@ public class GeneratorController {
 
 
         generatorService.validGenerator(generator, true);
-        User loginUser = userService.getLoginUser(request);
+
         generator.setUserId(loginUser.getId());
         generator.setFavourNum(0);
         generator.setThumbNum(0);
@@ -197,19 +201,44 @@ public class GeneratorController {
      * 分页获取列表（封装类）
      *
      * @param generatorQueryRequest
-     * @param request
      * @return
      */
+    @Deprecated
     @PostMapping("/list/page/vo")
-    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest,
-            HttpServletRequest request) {
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPage(@RequestBody GeneratorQueryRequest generatorQueryRequest) {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorQueryRequest));
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), generatorService.getQueryWrapper(generatorQueryRequest));
+        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage));
+    }
+
+    /**
+     * 分页获取列表（封装类）
+     *
+     * @param generatorQueryRequest
+     * @return
+     */
+    @PostMapping("/list/page/vo/v2")
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPageSimplifyData(
+            @RequestBody GeneratorQueryRequest generatorQueryRequest) {
+        long size = generatorQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+
+        // 优先从缓存获取
+        String cacheKey = CacheManager.getPageCacheKey(generatorQueryRequest);
+        Object cache = cacheManager.get(cacheKey);
+        if (Objects.nonNull(cache)) {
+            // noinspection unchecked
+            return ResultUtils.success((Page<GeneratorVO>) cache);
+        }
+        Page<GeneratorVO> generatorVOPage = generatorService.listGeneratorVOByPageSimplifyData(
+                generatorQueryRequest);
+        // 写入缓存
+        cacheManager.put(cacheKey, generatorVOPage);
+        return ResultUtils.success(generatorVOPage);
     }
 
     /**
@@ -233,7 +262,7 @@ public class GeneratorController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
                 generatorService.getQueryWrapper(generatorQueryRequest));
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage));
     }
 
 
@@ -281,6 +310,7 @@ public class GeneratorController {
         }
 
         User loginUser = userService.getLoginUser(request);
+        userService.reduceWalletBalance(loginUser.getId(), 10);
         Generator generator = generatorService.getById(id);
         if (generator == null) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
@@ -391,20 +421,5 @@ public class GeneratorController {
                         generator.getDistPath()))
                 .collect(Collectors.toList());
         LocalFileCacheManager.clearCache(cacheKeyList);
-    }
-    /**
-     * 得到 产物包的相对路径
-     */
-    private String getTruePath(String filePath){
-        int lastIndex = filePath.lastIndexOf('/');
-        int secondLastIndex = lastIndex != 0 ? filePath.lastIndexOf('/', lastIndex - 1) : -1;
-        int thirdLastIndex = secondLastIndex != 0 ? filePath.lastIndexOf('/', secondLastIndex - 1) : -1;
-        if (thirdLastIndex != -1) {
-            filePath= filePath.substring(thirdLastIndex);
-            System.out.println(filePath); // 输出类似: /path/to/file.txt
-        } else {
-            System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
-        }
-        return filePath;
     }
 }

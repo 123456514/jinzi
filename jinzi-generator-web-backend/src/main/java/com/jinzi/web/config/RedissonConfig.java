@@ -21,7 +21,7 @@ public class RedissonConfig {
         // 1. 创建配置
         Config config = new Config();
         String redisAddress ="redis://124.223.222.249:6379";
-        config.useSingleServer().setAddress(redisAddress).setDatabase(3).setPassword("123456");
+        config.useSingleServer().setAddress(redisAddress).setDatabase(1).setPassword("123456");
         // 2. 创建实例
         return Redisson.create(config);
     }

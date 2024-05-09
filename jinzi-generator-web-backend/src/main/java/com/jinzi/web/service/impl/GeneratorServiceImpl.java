@@ -58,10 +58,6 @@ import java.util.stream.Collectors;
 
 import static com.jinzi.web.manager.LocalFileCacheManager.getCacheFilePath;
 
-/**
- * 帖子服务实现
- *
- */
 @Service
 @Slf4j
 public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator> implements GeneratorService {
@@ -170,97 +166,126 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         return queryWrapper;
     }
 
-    /**
-     * 得到返回给前端的代码生成器的 VO信息
-     * @param Generator
-     * @param request
-     * @return
-     */
-    @Override
-    public GeneratorVO getGeneratorVO(Generator Generator, HttpServletRequest request) {
-        GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
 
-        long generatorId = Generator.getId();
-        // 1. 关联查询用户信息
-        Long userId = Generator.getUserId();
-        User user = null;
-        if (userId != null && userId > 0) {
-            user = userService.getById(userId);
-        }
-        UserVO userVO = userService.getUserVO(user);
-        generatorVO.setUser(userVO);
-        // 2. 已登录，获取用户点赞、收藏状态
-        User loginUser = userService.getLoginUserPermitNull(request);
-        if (loginUser != null) {
-            // 获取点赞
-            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
-            generatorThumbQueryWrapper.in("generatorId", generatorId);
-            generatorThumbQueryWrapper.eq("userId", loginUser.getId());
-            GeneratorThumb generatorThumb = generatorThumbMapper.selectOne(generatorThumbQueryWrapper);
-            generatorVO.setHasThumb(generatorThumb != null);
-            // 获取收藏
-            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
-            generatorFavourQueryWrapper.in("generatorId", generatorId);
-            generatorFavourQueryWrapper.eq("userId", loginUser.getId());
-            GeneratorFavour generatorFavour = generatorFavourMapper.selectOne(generatorFavourQueryWrapper);
-            generatorVO.setHasFavour(generatorFavour != null);
-        }
-        return generatorVO;
-    }
-
-    /**
-     * 获取分页代码生成器
-     * @param generatorPage
-     * @param request
-     * @return
-     */
+    //    /**
+//     * 得到返回给前端的代码生成器的 VO信息
+//     * @param Generator
+//     * @param request
+//     * @return
+//     */
+//    @Override
+//    public GeneratorVO getGeneratorVO(Generator Generator, HttpServletRequest request) {
+//        GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
+//
+//        long generatorId = Generator.getId();
+//        // 1. 关联查询用户信息
+//        Long userId = Generator.getUserId();
+//        User user = null;
+//        if (userId != null && userId > 0) {
+//            user = userService.getById(userId);
+//        }
+//        UserVO userVO = userService.getUserVO(user);
+//        generatorVO.setUser(userVO);
+//        // 2. 已登录，获取用户点赞、收藏状态
+//        User loginUser = userService.getLoginUserPermitNull(request);
+//        if (loginUser != null) {
+//            // 获取点赞
+//            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
+//            generatorThumbQueryWrapper.in("generatorId", generatorId);
+//            generatorThumbQueryWrapper.eq("userId", loginUser.getId());
+//            GeneratorThumb generatorThumb = generatorThumbMapper.selectOne(generatorThumbQueryWrapper);
+//            generatorVO.setHasThumb(generatorThumb != null);
+//            // 获取收藏
+//            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
+//            generatorFavourQueryWrapper.in("generatorId", generatorId);
+//            generatorFavourQueryWrapper.eq("userId", loginUser.getId());
+//            GeneratorFavour generatorFavour = generatorFavourMapper.selectOne(generatorFavourQueryWrapper);
+//            generatorVO.setHasFavour(generatorFavour != null);
+//        }
+//        return generatorVO;
+//    }
     @Override
-    public Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request) {
+    public Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage) {
         List<Generator> generatorList = generatorPage.getRecords();
-        Page<GeneratorVO> generatorVOPage = new Page<>(generatorPage.getCurrent(), generatorPage.getSize(), generatorPage.getTotal());
+        Page<GeneratorVO> generatorVOPage = new Page<>(generatorPage.getCurrent(),
+                generatorPage.getSize(),
+                generatorPage.getTotal());
         if (CollUtil.isEmpty(generatorList)) {
             return generatorVOPage;
         }
         // 1. 关联查询用户信息
         Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
-        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
-                .collect(Collectors.groupingBy(User::getId));
-        // 2. 已登录，获取用户点赞、收藏状态
-        Map<Long, Boolean> generatorIdHasThumbMap = new HashMap<>();
-        Map<Long, Boolean> generatorIdHasFavourMap = new HashMap<>();
-        User loginUser = userService.getLoginUserPermitNull(request);
-        if (loginUser != null) {
-            Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
-            User login  = userService.getLoginUser(request);
-            // 获取点赞
-            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
-            generatorThumbQueryWrapper.in("generatorId", generatorIdSet);
-            generatorThumbQueryWrapper.eq("userId", login.getId());
-            List<GeneratorThumb> generatorGeneratorThumbList = generatorThumbMapper.selectList(generatorThumbQueryWrapper);
-            generatorGeneratorThumbList.forEach(generatorGeneratorThumb -> generatorIdHasThumbMap.put(generatorGeneratorThumb.getGeneratorId(), true));
-            // 获取收藏
-            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
-            generatorFavourQueryWrapper.in("generatorId", generatorIdSet);
-            generatorFavourQueryWrapper.eq("userId", login.getId());
-            List<GeneratorFavour> generatorFavourList = generatorFavourMapper.selectList(generatorFavourQueryWrapper);
-            generatorFavourList.forEach(generatorFavour -> generatorIdHasFavourMap.put(generatorFavour.getGeneratorId(), true));
-        }
+        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
         // 填充信息
-        List<GeneratorVO> generatorVOList = generatorList.stream().map(Generator -> {
-            GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
-            Long userId = Generator.getUserId();
+        List<GeneratorVO> generatorVOList = generatorList.stream().map(generator -> {
+            GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
+            if (Objects.isNull(generatorVO)) {
+                return null;
+            }
+            Long userId = generator.getUserId();
             User user = null;
             if (userIdUserListMap.containsKey(userId)) {
                 user = userIdUserListMap.get(userId).get(0);
             }
             generatorVO.setUser(userService.getUserVO(user));
-            generatorVO.setHasThumb(generatorIdHasThumbMap.getOrDefault(Generator.getId(), false));
-            generatorVO.setHasFavour(generatorIdHasFavourMap.getOrDefault(Generator.getId(), false));
             return generatorVO;
         }).collect(Collectors.toList());
         generatorVOPage.setRecords(generatorVOList);
         return generatorVOPage;
     }
+//    /**
+//     * 获取分页代码生成器
+//     * @param generatorPage
+//     * @param request
+//     * @return
+//     */
+//    @Override
+//    public Page<GeneratorVO> getGeneratorVOPage(Page<Generator> generatorPage, HttpServletRequest request) {
+//        List<Generator> generatorList = generatorPage.getRecords();
+//        Page<GeneratorVO> generatorVOPage = new Page<>(generatorPage.getCurrent(), generatorPage.getSize(), generatorPage.getTotal());
+//        if (CollUtil.isEmpty(generatorList)) {
+//            return generatorVOPage;
+//        }
+//        // 1. 关联查询用户信息
+//        Set<Long> userIdSet = generatorList.stream().map(Generator::getUserId).collect(Collectors.toSet());
+//        Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream()
+//                .collect(Collectors.groupingBy(User::getId));
+//        // 2. 已登录，获取用户点赞、收藏状态
+//        Map<Long, Boolean> generatorIdHasThumbMap = new HashMap<>();
+//        Map<Long, Boolean> generatorIdHasFavourMap = new HashMap<>();
+//        User loginUser = userService.getLoginUserPermitNull(request);
+//        if (loginUser != null) {
+//            Set<Long> generatorIdSet = generatorList.stream().map(Generator::getId).collect(Collectors.toSet());
+//            User login  = userService.getLoginUser(request);
+//            // 获取点赞
+//            QueryWrapper<GeneratorThumb> generatorThumbQueryWrapper = new QueryWrapper<>();
+//            generatorThumbQueryWrapper.in("generatorId", generatorIdSet);
+//            generatorThumbQueryWrapper.eq("userId", login.getId());
+//            List<GeneratorThumb> generatorGeneratorThumbList = generatorThumbMapper.selectList(generatorThumbQueryWrapper);
+//            generatorGeneratorThumbList.forEach(generatorGeneratorThumb -> generatorIdHasThumbMap.put(generatorGeneratorThumb.getGeneratorId(), true));
+//            // 获取收藏
+//            QueryWrapper<GeneratorFavour> generatorFavourQueryWrapper = new QueryWrapper<>();
+//            generatorFavourQueryWrapper.in("generatorId", generatorIdSet);
+//            generatorFavourQueryWrapper.eq("userId", login.getId());
+//            List<GeneratorFavour> generatorFavourList = generatorFavourMapper.selectList(generatorFavourQueryWrapper);
+//            generatorFavourList.forEach(generatorFavour -> generatorIdHasFavourMap.put(generatorFavour.getGeneratorId(), true));
+//        }
+//        // 填充信息
+//        List<GeneratorVO> generatorVOList = generatorList.stream().map(Generator -> {
+//            GeneratorVO generatorVO = GeneratorConvert.INSTANCE.convertGeneratorVOByGenerator(Generator);
+//            Long userId = Generator.getUserId();
+//            User user = null;
+//            if (userIdUserListMap.containsKey(userId)) {
+//                user = userIdUserListMap.get(userId).get(0);
+//            }
+//            generatorVO.setUser(userService.getUserVO(user));
+//            generatorVO.setHasThumb(generatorIdHasThumbMap.getOrDefault(Generator.getId(), false));
+//            generatorVO.setHasFavour(generatorIdHasFavourMap.getOrDefault(Generator.getId(), false));
+//            return generatorVO;
+//        }).collect(Collectors.toList());
+//        generatorVOPage.setRecords(generatorVOList);
+//        return generatorVOPage;
+//    }
 
     /**
      * 缓存代码生成器
@@ -357,140 +382,6 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
         }
     }
 
-    /**
-     * 使用代码生成器
-     * @param path
-     * @param generatorId
-     * @param loginUserId
-     * @param dataModel
-     * @param response
-     */
-    @Override
-    public void useGenerator(String path,long generatorId,long loginUserId,Map<String, Object> dataModel,HttpServletResponse response) {
-        // 生成器的存储路径
-        String distPath = getTruePath(path);
-        if (StrUtil.isBlank(distPath)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
-        }
-
-        // 从对象存储下载生成器的压缩包
-        // 定义独立的工作空间
-        String projectPath = System.getProperty("user.dir");
-        // 必须要用 userId 区分，否则可能会导致输入参数文件冲突
-        String tempDirPath = String.format("%s/.temp/use/%s/%s", projectPath, generatorId, loginUserId);
-        String zipFilePath = tempDirPath + "/dist.zip";
-
-        // 目录不存在则创建
-        if (!FileUtil.exist(tempDirPath)) {
-            FileUtil.mkdir(tempDirPath);
-        }
-
-        // 使用文件缓存
-        String cacheFilePath = getCacheFilePath(generatorId, distPath);
-        Path cacheFilePathObj = Paths.get(cacheFilePath);
-        Path zipFilePathObj = Paths.get(zipFilePath);
-        if (!FileUtil.exist(zipFilePath)) {
-            // 有缓存，复制文件
-            if (FileUtil.exist(cacheFilePath)) {
-                try {
-                    Files.copy(cacheFilePathObj, zipFilePathObj);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                // 没有缓存，从对象存储下载文件
-                FileUtil.touch(zipFilePath);
-                try {
-                    cosManager.download(distPath, zipFilePath);
-                } catch (Exception e) {
-                    throw new BusinessException(ErrorCode.SYSTEM_ERROR, "生成器下载失败");
-                }
-                // 写文件缓存
-                File parentFile = cacheFilePathObj.toFile().getParentFile();
-                if (!FileUtil.exist(parentFile)) {
-                    FileUtil.mkdir(parentFile);
-                }
-                try {
-                    Files.copy(zipFilePathObj, cacheFilePathObj);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        // 解压压缩包，得到脚本文件
-        File unzipDistDir = ZipUtil.unzip(zipFilePath);
-
-        // 将用户输入的参数写到 json 文件中
-        String dataModelFilePath = tempDirPath + "/dataModel.json";
-        String jsonStr = JSONUtil.toJsonStr(dataModel);
-        FileUtil.writeUtf8String(jsonStr, dataModelFilePath);
-
-        // 执行脚本
-        // 找到脚本文件所在路径
-        // 要注意，如果不是 windows 系统，找 generator 文件而不是 bat
-        // 依次遍历整个文件目录
-        File scriptFile = FileUtil.loopFiles(unzipDistDir, 2, null)
-                .stream()
-                .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
-                .findFirst()
-                .orElseThrow(RuntimeException::new);
-        // 添加可执行权限
-        try {
-            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
-            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
-        } catch (Exception e) {
-
-        }
-
-        // 构造命令
-        File scriptDir = scriptFile.getParentFile();
-        // win 系统
-        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
-        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
-
-        // 注意，如果是 mac / linux 系统，要用 "./generator"
-//        String scriptAbsolutePath = scriptFile.getAbsolutePath();
-//        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelFilePath};
-
-        // 这里一定要拆分！
-        ProcessBuilder processBuilder = new ProcessBuilder(commands);
-        processBuilder.directory(scriptDir);
-
-        try {
-            Process process = processBuilder.start();
-            // 读取命令的输出
-            InputStream inputStream = process.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-            // 等待命令执行完成
-            int exitCode = process.waitFor();
-            System.out.println("命令执行结束，退出码：" + exitCode);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行生成器脚本错误");
-        }
-
-        // 压缩得到的生成结果，返回给前端
-        String generatedPath = scriptDir.getAbsolutePath() + "/generated";
-        String resultPath = tempDirPath + "/result.zip";
-        File resultFile = ZipUtil.zip(generatedPath, resultPath);
-
-        // 设置响应头
-        response.setContentType("application/octet-stream;charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=" + resultFile.getName());
-        try {
-            Files.copy(resultFile.toPath(), response.getOutputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        // 清理文件
-        CompletableFuture.runAsync(() -> {
-            FileUtil.del(tempDirPath);
-        });
-    }
 
 
     @Override
@@ -670,6 +561,20 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             FileUtil.del(tempDirPath);
         });
     }
+    @Override
+    public List<Long> listHotGeneratorIds() {
+        return generatorMapper.listHotGeneratorIds();
+    }
+    @Override
+    public Page<GeneratorVO> listGeneratorVOByPageSimplifyData(GeneratorQueryRequest generatorQueryRequest) {
+        long current = generatorQueryRequest.getCurrent();
+        long size = generatorQueryRequest.getPageSize();
+        QueryWrapper<Generator> queryWrapper = this.getQueryWrapper(
+                generatorQueryRequest);
+        queryWrapper.select("id", "name", "description", "author", "tags",
+                "picture", "userId", "createTime", "updateTime");
+        return this.getGeneratorVOPage(this.page(new Page<>(current, size), queryWrapper));
+    }
 
     /**
      * 增加下载次数
@@ -704,6 +609,23 @@ public class GeneratorServiceImpl extends ServiceImpl<GeneratorMapper, Generator
             System.out.println("没有找到倒数第三个'/'或字符串中'/'的数量少于2个。");
         }
         return filePath;
+    }
+    @Override
+    public GeneratorVO getGeneratorVO(Generator generator, HttpServletRequest request) {
+        GeneratorVO generatorVO = GeneratorVO.objToVo(generator);
+        if (Objects.isNull(generatorVO)) {
+            return null;
+        }
+        // 关联查询用户信息
+        Long userId = generator.getUserId();
+        User user = null;
+        if (userId != null && userId > 0) {
+            user = userService.getById(userId);
+        }
+        UserVO userVO = userService.getUserVO(user);
+        generatorVO.setUser(userVO);
+
+        return generatorVO;
     }
 }
 

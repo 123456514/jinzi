@@ -18,7 +18,8 @@ public enum ErrorCode {
     /**
      * 账号已封禁
      */
-    PROHIBITED(40001, "账号已封禁");
+    PROHIBITED(40001, "账号已封禁"),
+    NO_FULL(40002,"积分不足，请签到或购买积分");
 
     /**
      * 状态码

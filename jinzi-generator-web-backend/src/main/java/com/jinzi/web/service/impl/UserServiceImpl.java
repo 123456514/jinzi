@@ -391,18 +391,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         BeanUtils.copyProperties(retUser,loginUser);
         return retUser;
     }
-    public static boolean isThirdLastCharacterDot(String str) {
-        // 检查字符串长度是否至少为3，因为我们需要访问倒数第四个字符
-        if (str.length() < 4) {
-            return false;
-        }
-
-        // 计算倒数第三个字符的索引
-        int index = str.length() - 4;
-
-        // 使用charAt方法获取该位置的字符，并检查它是否是"."
-        return str.charAt(index) == '.';
-    }
     /**
      * 获取当前登录用户
      *
@@ -665,4 +653,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             }
         }
     }
+    @Override
+    public boolean reduceWalletBalance(Long userId, Integer reduceScore) {
+        LambdaUpdateWrapper<User> userLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        userLambdaUpdateWrapper.eq(User::getId, userId);
+        userLambdaUpdateWrapper.setSql("balance = balance - " + reduceScore);
+        return this.update(userLambdaUpdateWrapper);
+    }
+
 }

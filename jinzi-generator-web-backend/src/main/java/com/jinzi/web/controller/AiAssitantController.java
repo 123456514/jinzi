@@ -1,5 +1,6 @@
 package com.jinzi.web.controller;
 
+ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
  import com.jinzi.web.annotation.CheckBanStatus;
  import com.jinzi.web.common.BaseResponse;
  import com.jinzi.web.common.ErrorCode;
@@ -49,11 +50,17 @@ public class AiAssitantController {
     @PostMapping("/chat")
     @CheckBanStatus
     public BaseResponse<?> aiAssistant(@RequestBody GenChatByAiRequest genChatByAiRequest, HttpServletRequest request) {
+
+        User loginUser = userService.getLoginUser(request);
+        boolean isFull = userService.reduceWalletBalance(loginUser.getId(), 10);
+        if(!isFull){
+            return ResultUtils.success("积分不足，请签到获取或购买积分");
+        }
         SparkClient sparkClient = new SparkClient();
         String questionName = genChatByAiRequest.getQuestionName();
         String questionGoal = genChatByAiRequest.getQuestionGoal();
         String questionType = genChatByAiRequest.getQuestionType();
-        User loginUser = userService.getLoginUser(request);
+
         // 校验
         if (StringUtils.isBlank(questionName)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "问题名称为空");
@@ -100,9 +107,6 @@ public class AiAssitantController {
         aiAssistant.setQuestionStatus("succeed");
         boolean saveResult = aiAssistantService.save(aiAssistant);
         ThrowUtils.throwIf(!saveResult, ErrorCode.SYSTEM_ERROR, "ai对话保存失败");
-
-
-//        System.out.println(result);
         return ResultUtils.success(aiAssistant);
     }
 }

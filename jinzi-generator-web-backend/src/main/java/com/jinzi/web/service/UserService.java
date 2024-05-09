@@ -127,6 +127,14 @@ public interface UserService extends IService<User> {
      * @return boolean
      */
     boolean addWalletBalance(Long userId, Integer addPoints);
+    /**
+     * 减少钱包余额
+     *
+     * @param userId      用户id
+     * @param reduceScore 减少分数
+     * @return boolean
+     */
+    boolean reduceWalletBalance(Long userId, Integer reduceScore);
 
     /**
      * 用户绑定电子邮件

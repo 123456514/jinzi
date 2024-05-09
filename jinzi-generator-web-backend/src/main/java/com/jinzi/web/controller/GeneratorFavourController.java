@@ -84,7 +84,7 @@ public class GeneratorFavourController {
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<Generator> generatorPage = generatorFavourService.listFavourGeneratorByPage(new Page<>(current, size),
                 generatorService.getQueryWrapper(generatorQueryRequest), loginUser.getId());
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage));
     }
 
     /**
@@ -94,8 +94,7 @@ public class GeneratorFavourController {
      * @param request
      */
     @PostMapping("/list/page")
-    public BaseResponse<Page<GeneratorVO>> listFavourGeneratorByPage(@RequestBody GeneratorFavourQueryRequest generatorFavourQueryRequest,
-                                                                HttpServletRequest request) {
+    public BaseResponse<Page<GeneratorVO>> listFavourGeneratorByPage(@RequestBody GeneratorFavourQueryRequest generatorFavourQueryRequest, HttpServletRequest request) {
         if (generatorFavourQueryRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -104,8 +103,7 @@ public class GeneratorFavourController {
         Long userId = generatorFavourQueryRequest.getUserId();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20 || userId == null, ErrorCode.PARAMS_ERROR);
-        Page<Generator> generatorPage = generatorFavourService.listFavourGeneratorByPage(new Page<>(current, size),
-                generatorService.getQueryWrapper(generatorFavourQueryRequest.getGeneratorQueryRequest()), userId);
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        Page<Generator> generatorPage = generatorFavourService.listFavourGeneratorByPage(new Page<>(current, size), generatorService.getQueryWrapper(generatorFavourQueryRequest.getGeneratorQueryRequest()), userId);
+        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage));
     }
 }
